@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AVR–S · Cockpit do Projeto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+:root {
+  --bg:     #0a0908;
+  --bg2:    #121110;
+  --bg3:    #1a1816;
+  --bg4:    #222018;
+  --gold:   #d4b87a;
+  --gold2:  #ebd49e;
+  --cream:  #f5f0e8;
+  --text2:  #b8b0a4;
+  --text3:  #6a6460;
+  --border: rgba(212,184,122,.12);
+  --border2:rgba(212,184,122,.25);
+  --r:      12px;
+  --r2:     8px;
+}
+
+* { box-sizing:border-box; margin:0; padding:0; }
+
+body {
+  background: var(--bg);
+  color: var(--cream);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── HEADER ── */
+.header {
+  border-bottom: 1px solid var(--border);
+  padding: 18px 24px 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  background: rgba(10,9,8,.92);
+  backdrop-filter: blur(12px);
+  z-index: 100;
+}
+.header-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--gold);
+  letter-spacing: .04em;
+}
+.header-sub {
+  font-size: 11px;
+  color: var(--text3);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.header-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.header-date {
+  font-size: 11px;
+  color: var(--text3);
+}
+.progress-pill {
+  background: rgba(212,184,122,.1);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 11px;
+  color: var(--gold);
+  font-weight: 500;
+}
+
+/* ── LAYOUT ── */
+.main { padding: 20px 24px 40px; max-width: 900px; margin: 0 auto; }
+
+/* ── SEÇÕES ── */
+.section { margin-bottom: 24px; }
+.section-title {
+  font-size: 10px;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-title i { font-size: 14px; color: var(--gold); }
+
+/* ── LINKS RÁPIDOS ── */
+.links-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+}
+.link-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 14px 16px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all .2s;
+  cursor: pointer;
+}
+.link-card:hover {
+  border-color: var(--border2);
+  background: var(--bg4);
+  transform: translateY(-2px);
+}
+.link-card i { font-size: 20px; color: var(--gold); flex-shrink: 0; }
+.link-info {}
+.link-nome { font-size: 13px; color: var(--cream); font-weight: 500; }
+.link-url  { font-size: 10px; color: var(--text3); margin-top: 1px; }
+
+/* ── PILARES ── */
+.pilares {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+@media(max-width:600px){ .pilares{ grid-template-columns:1fr; } }
+
+.pilar {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.pilar-header {
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.pilar-header i { font-size: 20px; margin-top: 1px; }
+.pilar-nome { font-size: 14px; font-weight: 500; color: var(--cream); }
+.pilar-sub  { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.pilar-items { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 6px; }
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: var(--r2);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all .2s;
+  background: var(--bg2);
+  user-select: none;
+}
+.item:hover { border-color: var(--border2); transform: translateY(-1px); }
+.item-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.item-label { font-size: 12px; color: var(--cream); flex: 1; }
+.item-badge {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.s-done .item-dot  { background: #d4b87a; }
+.s-done .item-badge{ background:rgba(212,184,122,.12); color:var(--gold); border:1px solid var(--border2); }
+.s-prog .item-dot  { background: #EF9F27; }
+.s-prog .item-badge{ background:rgba(239,159,39,.12); color:#EF9F27; border:1px solid rgba(239,159,39,.3); }
+.s-pend .item-dot  { background: #6a6460; }
+.s-pend .item-badge{ background:rgba(106,100,96,.1); color:var(--text3); border:1px solid rgba(106,100,96,.2); }
+
+/* ── INPI ── */
+.inpi-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 16px 18px;
+  display: flex;
+  gap: 14px;
+}
+.inpi-card i.lock { font-size: 22px; color: var(--text3); flex-shrink: 0; margin-top: 2px; }
+.inpi-info { flex: 1; }
+.inpi-top { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.inpi-nome { font-size: 14px; font-weight: 500; color: var(--cream); }
+.inpi-badge {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: rgba(106,100,96,.15);
+  color: var(--text3);
+  border: 1px solid rgba(106,100,96,.25);
+}
+.inpi-sub { font-size: 11px; color: var(--text3); margin-bottom: 10px; }
+.inpi-items { display: flex; flex-direction: column; gap: 6px; }
+
+/* ── SEQUÊNCIA ── */
+.seq {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 16px 20px;
+}
+.seq-step { display: flex; flex-direction: column; align-items: center; gap: 5px; flex: 1; }
+.seq-circle {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 500;
+  border: 1.5px solid var(--border2);
+  color: var(--text3);
+  background: var(--bg2);
+  transition: all .3s;
+}
+.seq-circle.done { border-color: var(--gold); color: var(--gold); background: rgba(212,184,122,.08); }
+.seq-label { font-size: 10px; color: var(--text3); white-space: nowrap; }
+.seq-arrow {
+  flex: 1; height: 1px;
+  background: var(--border);
+  position: relative;
+  top: -12px;
+  max-width: 40px;
+}
+.seq-arrow::after {
+  content:'';
+  position: absolute;
+  right: -4px; top: -4px;
+  border: 4px solid transparent;
+  border-left: 6px solid var(--border);
+}
+.seq-pct {
+  margin-left: 16px;
+  font-size: 11px;
+  color: var(--text3);
+  white-space: nowrap;
+  top: -10px;
+  position: relative;
+}
+
+/* ── NOTAS ── */
+.notas-area {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.notas-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.notas-header span { font-size: 12px; font-weight: 500; color: var(--text2); }
+.notas-list {
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.notas-list::-webkit-scrollbar { width: 4px; }
+.notas-list::-webkit-scrollbar-track { background: transparent; }
+.notas-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+.nota-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--r2);
+  background: var(--bg2);
+  border: 1px solid var(--border);
+}
+.nota-data  { font-size: 10px; color: var(--text3); white-space: nowrap; margin-top: 1px; }
+.nota-texto { font-size: 12px; color: var(--cream); flex: 1; line-height: 1.5; }
+.nota-del   { background: none; border: none; cursor: pointer; color: var(--text3); font-size: 14px; padding: 0; flex-shrink: 0; }
+.nota-del:hover { color: #d46a6a; }
+.notas-vazia { font-size: 12px; color: var(--text3); text-align: center; padding: 16px 0; }
+.notas-input-row {
+  padding: 10px 12px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 8px;
+}
+.notas-input {
+  flex: 1;
+  border: 1px solid var(--border2);
+  border-radius: var(--r2);
+  padding: 8px 12px;
+  font-size: 12px;
+  background: var(--bg2);
+  color: var(--cream);
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+}
+.notas-input:focus { border-color: rgba(212,184,122,.5); }
+.notas-btn {
+  background: rgba(212,184,122,.12);
+  border: 1px solid var(--border2);
+  border-radius: var(--r2);
+  padding: 8px 16px;
+  font-size: 12px;
+  color: var(--gold);
+  cursor: pointer;
+  font-weight: 500;
+  white-space: nowrap;
+  font-family: 'DM Sans', sans-serif;
+}
+.notas-btn:hover { background: rgba(212,184,122,.2); }
+
+/* ── LEGENDA ── */
+.legenda {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.leg-item { display: flex; align-items: center; gap: 5px; }
+.leg-dot  { width: 8px; height: 8px; border-radius: 50%; }
+.leg-txt  { font-size: 11px; color: var(--text3); }
+
+/* ── FOOTER ── */
+.footer {
+  text-align: center;
+  padding: 20px;
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--text3);
+  line-height: 1.8;
+}
+
+/* ── PRINT ── */
+@media print {
+  body { background: #fff; color: #111; }
+  .header { background: #fff; position: relative; border-bottom: 1px solid #ddd; }
+  .header-logo { color: #8a6830; }
+  .section-title { color: #888; }
+  .link-card, .pilar, .inpi-card, .seq, .notas-area {
+    background: #fafafa !important;
+    border-color: #ddd !important;
+    break-inside: avoid;
+  }
+  .pilar-nome, .item-label, .link-nome, .inpi-nome { color: #111 !important; }
+  .notas-input-row { display: none; }
+  .nota-del { display: none; }
+  .footer { border-top: 1px solid #ddd; color: #aaa; }
+}
+
+/* ── MOBILE ── */
+@media(max-width:500px) {
+  .main { padding: 14px 14px 40px; }
+  .header { padding: 14px 16px; }
+  .links-grid { grid-template-columns: 1fr 1fr; }
+  .seq { padding: 12px 10px; }
+  .seq-circle { width: 30px; height: 30px; font-size: 11px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div>
+    <div class="header-logo">AVR–S</div>
+    <div class="header-sub">Cockpit do Projeto · Audax Consultoria</div>
+  </div>
+  <div class="header-right">
+    <span class="header-date" id="headerDate"></span>
+    <span class="progress-pill" id="progressPill">0%</span>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- LINKS RÁPIDOS -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-bolt"></i> Acesso rápido</div>
+    <div class="links-grid">
+      <a class="link-card" href="https://audaxsilfexsil-sketch.github.io/avrs-app-" target="_blank">
+        <i class="ti ti-device-mobile"></i>
+        <div class="link-info">
+          <div class="link-nome">App AVR–S</div>
+          <div class="link-url">github.io/avrs-app-</div>
+        </div>
+      </a>
+      <a class="link-card" href="https://github.com/audaxsilfexsil-sketch/avrs-app-" target="_blank">
+        <i class="ti ti-brand-github"></i>
+        <div class="link-info">
+          <div class="link-nome">Repositório</div>
+          <div class="link-url">github.com</div>
+        </div>
+      </a>
+      <a class="link-card" href="https://pag.ae/81P9a56Kv/button" target="_blank">
+        <i class="ti ti-credit-card"></i>
+        <div class="link-info">
+          <div class="link-nome">PagBank Pro</div>
+          <div class="link-url">R$19/mês</div>
+        </div>
+      </a>
+      <a class="link-card" href="https://avrs-proxy.audax-silfexsil.workers.dev" target="_blank">
+        <i class="ti ti-cloud"></i>
+        <div class="link-info">
+          <div class="link-nome">Worker IA</div>
+          <div class="link-url">Cloudflare</div>
+        </div>
+      </a>
+      <a class="link-card" href="https://console.firebase.google.com" target="_blank">
+        <i class="ti ti-database"></i>
+        <div class="link-info">
+          <div class="link-nome">Firebase</div>
+          <div class="link-url">avrs-app · southamerica</div>
+        </div>
+      </a>
+      <a class="link-card" href="https://inpi.gov.br" target="_blank">
+        <i class="ti ti-shield-lock"></i>
+        <div class="link-info">
+          <div class="link-nome">INPI</div>
+          <div class="link-url">inpi.gov.br</div>
+        </div>
+      </a>
+      <div class="link-card" onclick="window.location='mailto:audax.silfexsil@gmail.com'">
+        <i class="ti ti-mail"></i>
+        <div class="link-info">
+          <div class="link-nome">E-mail</div>
+          <div class="link-url">audax.silfexsil@gmail.com</div>
+        </div>
+      </div>
+      <div class="link-card" onclick="window.location='https://wa.me/5521964164234'">
+        <i class="ti ti-brand-whatsapp"></i>
+        <div class="link-info">
+          <div class="link-nome">WhatsApp</div>
+          <div class="link-url">(21) 96416-4234</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MÉTODO -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-circle-letter-a"></i> Método central</div>
+    <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:16px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+      <div style="flex:1;min-width:200px">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--gold)">AVR–S</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px">A Vida Sem Rascunho · Consciência e Decisão</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">Audax Consultoria · CNPJ 33.344.650/0001-03</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <span style="background:rgba(212,184,122,.1);border:1px solid var(--border2);border-radius:20px;padding:4px 12px;font-size:11px;color:var(--gold)">Regular</span>
+        <span style="background:rgba(212,184,122,.1);border:1px solid var(--border2);border-radius:20px;padding:4px 12px;font-size:11px;color:var(--gold)">Atenção</span>
+        <span style="background:rgba(212,184,122,.1);border:1px solid var(--border2);border-radius:20px;padding:4px 12px;font-size:11px;color:var(--gold)">Visão</span>
+        <span style="background:rgba(212,184,122,.1);border:1px solid var(--border2);border-radius:20px;padding:4px 12px;font-size:11px;color:var(--gold)">Resposta</span>
+        <span style="background:rgba(212,184,122,.1);border:1px solid var(--border2);border-radius:20px;padding:4px 12px;font-size:11px;color:var(--gold)">Sistema</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRÍADE -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-layout-grid"></i> Tríade de implementação</div>
+    <div class="pilares" id="pilares"></div>
+  </div>
+
+  <!-- INPI -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-shield"></i> Proteção intelectual · uso interno</div>
+    <div class="inpi-card">
+      <i class="ti ti-shield-lock lock"></i>
+      <div class="inpi-info">
+        <div class="inpi-top">
+          <div class="inpi-nome">Registro INPI — Marca AVR–S</div>
+          <span class="inpi-badge">🔒 Confidencial</span>
+        </div>
+        <div class="inpi-sub">Classes 41 (educação) e 42 (software) · Custo estimado R$710 · inpi.gov.br</div>
+        <div class="inpi-items" id="inpiItems"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEQUÊNCIA -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-route"></i> Sequência de ativação</div>
+    <div class="seq" id="seq"></div>
+  </div>
+
+  <!-- LEGENDA -->
+  <div class="section" style="margin-bottom:16px">
+    <div class="legenda">
+      <div class="leg-item"><div class="leg-dot" style="background:var(--gold)"></div><span class="leg-txt">Concluído</span></div>
+      <div class="leg-item"><div class="leg-dot" style="background:#EF9F27"></div><span class="leg-txt">Em andamento</span></div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--text3)"></div><span class="leg-txt">Pendente</span></div>
+      <span style="font-size:11px;color:var(--text3);margin-left:4px">· toque nos itens para alterar</span>
+    </div>
+  </div>
+
+  <!-- NOTAS -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-notes"></i> Anotações do projeto</div>
+    <div class="notas-area">
+      <div class="notas-header">
+        <i class="ti ti-edit" style="font-size:15px;color:var(--text3)"></i>
+        <span>Registro de decisões e próximos passos</span>
+      </div>
+      <div class="notas-list" id="notasList"></div>
+      <div class="notas-input-row">
+        <input class="notas-input" id="notaInput" placeholder="Nova anotação..." onkeydown="if(event.key==='Enter')addNota()"/>
+        <button class="notas-btn" onclick="addNota()"><i class="ti ti-plus"></i> Adicionar</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="footer">
+  AVR–S · A Vida Sem Rascunho · Audax Consultoria<br>
+  CNPJ 33.344.650/0001-03 · audax.silfexsil@gmail.com · (21) 96416-4234<br>
+  © 2025 Todos os direitos reservados · Documento interno
+</footer>
+
+<script>
+const CICLOS = ['done','prog','pend'];
+const LABELS = { done:'Concluído', prog:'Em andamento', pend:'Pendente' };
+
+const PILARES = [
+  {
+    id:'livro', nome:'Livro', sub:'A Vida Sem Rascunho', icon:'ti-book',
+    items:[
+      {id:'l1', label:'35 capítulos escritos',       status:'done'},
+      {id:'l2', label:'6 capítulos novos inseridos', status:'done'},
+      {id:'l3', label:'Sumário definitivo',           status:'done'},
+      {id:'l4', label:'Diagramação (194 págs)',       status:'pend'},
+      {id:'l5', label:'Revisão final',                status:'pend'},
+    ]
+  },
+  {
+    id:'palestra', nome:'Palestra', sub:'Geral + Liderança', icon:'ti-presentation',
+    items:[
+      {id:'p1', label:'Slides palestra geral',       status:'done'},
+      {id:'p2', label:'Slides liderança',            status:'done'},
+      {id:'p3', label:'História real integrada',     status:'done'},
+      {id:'p4', label:'Ensaio / dry run',            status:'pend'},
+      {id:'p5', label:'Primeira apresentação',       status:'pend'},
+    ]
+  },
+  {
+    id:'app', nome:'App', sub:'AVR–S Digital', icon:'ti-device-mobile',
+    items:[
+      {id:'a1', label:'Firebase + login',        status:'done'},
+      {id:'a2', label:'Mentor IA com voz',       status:'done'},
+      {id:'a3', label:'Paywall PagBank',         status:'done'},
+      {id:'a4', label:'Ícone personalizado',     status:'pend'},
+      {id:'a5', label:'Tutorial em vídeo',       status:'pend'},
+    ]
+  }
+];
+
+const INPI_ITEMS = [
+  {id:'i1', label:'Busca prévia no e-INPI',         status:'pend'},
+  {id:'i2', label:'Pedido Classe 41 — Educação',    status:'pend'},
+  {id:'i3', label:'Pedido Classe 42 — Software',    status:'pend'},
+  {id:'i4', label:'Pagamento GRU (~R$710)',          status:'pend'},
+  {id:'i5', label:'Protocolo de depósito recebido', status:'pend'},
+];
+
+const SEQ = [
+  { label:'Livro' },
+  { label:'Palestra' },
+  { label:'App' },
+  { label:'INPI 🔒', interno:true },
+  { label:'Escala' },
+];
+
+// Estado persistido em localStorage
+let estado = JSON.parse(localStorage.getItem('avrs_status') || '{}');
+let notas  = JSON.parse(localStorage.getItem('avrs_notas')  || '[]');
+
+// Inicializar defaults
+PILARES.forEach(p => p.items.forEach(it => { if(!estado[it.id]) estado[it.id] = it.status; }));
+INPI_ITEMS.forEach(it => { if(!estado[it.id]) estado[it.id] = it.status; });
+
+function salvar(){ localStorage.setItem('avrs_status', JSON.stringify(estado)); }
+
+function toggle(id){
+  const atual = estado[id] || 'pend';
+  estado[id] = CICLOS[(CICLOS.indexOf(atual)+1) % CICLOS.length];
+  salvar();
+  render();
+}
+
+function render(){
+  // Pilares
+  document.getElementById('pilares').innerHTML = PILARES.map(p => `
+    <div class="pilar">
+      <div class="pilar-header">
+        <i class="ti ${p.icon}" style="color:var(--gold)"></i>
+        <div>
+          <div class="pilar-nome">${p.nome}</div>
+          <div class="pilar-sub">${p.sub}</div>
+        </div>
+      </div>
+      <div class="pilar-items">
+        ${p.items.map(it => {
+          const s = estado[it.id]||'pend';
+          return `<div class="item s-${s}" onclick="toggle('${it.id}')">
+            <div class="item-dot"></div>
+            <span class="item-label">${it.label}</span>
+            <span class="item-badge">${LABELS[s]}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  `).join('');
+
+  // INPI
+  document.getElementById('inpiItems').innerHTML = INPI_ITEMS.map(it => {
+    const s = estado[it.id]||'pend';
+    return `<div class="item s-${s}" onclick="toggle('${it.id}')">
+      <div class="item-dot"></div>
+      <span class="item-label">${it.label}</span>
+      <span class="item-badge">${LABELS[s]}</span>
+    </div>`;
+  }).join('');
+
+  // Progresso
+  const todos = [...PILARES.flatMap(p=>p.items), ...INPI_ITEMS];
+  const conc  = todos.filter(it => (estado[it.id]||it.status) === 'done').length;
+  const pct   = Math.round(conc / todos.length * 100);
+  document.getElementById('progressPill').textContent = pct + '% concluído';
+
+  // Sequência
+  document.getElementById('seq').innerHTML = SEQ.map((s,i) => `
+    <div class="seq-step">
+      <div class="seq-circle ${pct > i*20 ? 'done' : ''}">${i+1}</div>
+      <span class="seq-label">${s.label}</span>
+    </div>
+    ${i < SEQ.length-1 ? '<div class="seq-arrow"></div>' : ''}
+  `).join('') + `<span class="seq-pct">${conc}/${todos.length}</span>`;
+}
+
+// Notas
+function addNota(){
+  const input = document.getElementById('notaInput');
+  const texto = input.value.trim();
+  if(!texto) return;
+  const agora = new Date();
+  const data  = agora.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'}) + ' ' +
+                agora.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  notas.unshift({ id: Date.now(), texto, data });
+  localStorage.setItem('avrs_notas', JSON.stringify(notas));
+  input.value = '';
+  renderNotas();
+}
+
+function delNota(id){
+  notas = notas.filter(n => n.id !== id);
+  localStorage.setItem('avrs_notas', JSON.stringify(notas));
+  renderNotas();
+}
+
+function renderNotas(){
+  const el = document.getElementById('notasList');
+  if(!notas.length){
+    el.innerHTML = '<div class="notas-vazia">Nenhuma anotação ainda. Adicione decisões, lembretes ou próximos passos.</div>';
+    return;
+  }
+  el.innerHTML = notas.map(n => `
+    <div class="nota-item">
+      <span class="nota-data">${n.data}</span>
+      <span class="nota-texto">${n.texto}</span>
+      <button class="nota-del" onclick="delNota(${n.id})"><i class="ti ti-x"></i></button>
+    </div>
+  `).join('');
+}
+
+// Data no header
+function renderDate(){
+  const d = new Date();
+  document.getElementById('headerDate').textContent =
+    d.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
+}
+
+render();
+renderNotas();
+renderDate();
+</script>
+</body>
+</html>
