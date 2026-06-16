@@ -155,6 +155,12 @@ body { background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;
 @media(max-width:500px){ .mat-grid{ grid-template-columns:1fr; } }
 @media print { .mat-btn{ display:none; } }
 
+/* CHECKLIST LANÇAMENTO */
+.launch-group { background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:10px; }
+.launch-group-title { font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;display:flex;align-items:center;gap:6px; }
+.launch-group-title i { font-size:14px; }
+.launch-progress { font-size:10px;color:var(--text3);margin-left:auto;font-weight:normal;letter-spacing:0;text-transform:none; }
+
 @media(max-width:500px){.main{padding:14px 14px 40px;}.header{padding:14px 16px;}.links-grid{grid-template-columns:1fr 1fr;}.seq{padding:12px 10px;}.seq-circle{width:30px;height:30px;font-size:11px;}}
 @media print{body{background:#fff;color:#111;}.header{background:#fff;position:relative;border-bottom:1px solid #ddd;}.header-logo{color:#8a6830;}.link-card,.pilar,.inpi-card,.seq,.notas-area{background:#fafafa!important;border-color:#ddd!important;break-inside:avoid;}.pilar-nome,.item-label,.link-nome,.inpi-nome{color:#111!important;}.notas-input-row{display:none;}.nota-del{display:none;}.footer{border-top:1px solid #ddd;color:#aaa;}}
 
@@ -514,6 +520,12 @@ body { background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;
     </div>
   </div>
 
+  <!-- CHECKLIST LANÇAMENTO -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-rocket"></i> Checklist de lançamento · Julho 2026</div>
+    <div id="launchChecklist"></div>
+  </div>
+
   <!-- NOTAS -->
   <div class="section">
     <div class="section-title"><i class="ti ti-notes"></i> Anotações do projeto</div>
@@ -570,12 +582,46 @@ const INPI_ITEMS=[
 ];
 const SEQ=[{label:'Livro'},{label:'Palestra'},{label:'App'},{label:'INPI 🔒'},{label:'Escala'}];
 
-let estado=JSON.parse(localStorage.getItem('avrs_status')||'{}');
+const LAUNCH_GROUPS=[
+  {id:'lc_content',nome:'Conteúdo & App',icon:'ti-device-mobile',items:[
+    {id:'lc1',label:'Manual do app — revisar e atualizar conteúdo',status:'pend'},
+    {id:'lc2',label:'Testar Jornada completa com dados reais (módulos 1-4)',status:'pend'},
+    {id:'lc3',label:'Testar Galeria com imagens carregando',status:'pend'},
+    {id:'lc4',label:'Verificar Score Final do diagnóstico completo',status:'pend'},
+    {id:'lc5',label:'Validar dias 6-20 da Jornada (Pro) com dados reais',status:'pend'},
+  ]},
+  {id:'lc_tech',nome:'Técnico',icon:'ti-settings',items:[
+    {id:'lc6',label:'Dual-cockpit — cockpit público para usuários do app',status:'pend'},
+    {id:'lc7',label:'Testar fluxo de assinatura Pro via PagBank ponta a ponta',status:'pend'},
+    {id:'lc8',label:'Testar Firebase Auth em dispositivos reais (iOS e Android)',status:'pend'},
+  ]},
+  {id:'lc_mkt',nome:'Marketing & Ecossistema',icon:'ti-speakerphone',items:[
+    {id:'lc9',label:'Landing page avrs.com.br — atualizar CTA para app.avrs.com.br',status:'pend'},
+    {id:'lc10',label:'Definir data exata de lançamento',status:'pend'},
+    {id:'lc11',label:'Definir canais de divulgação',status:'pend'},
+    {id:'lc12',label:'Definir preço Pro',status:'pend'},
+  ]},
+  {id:'lc_cockpit',nome:'Cockpit',icon:'ti-layout-dashboard',items:[
+    {id:'lc13',label:'Checklist de lançamento adicionado ao cockpit',status:'done'},
+  ]},
+];
+LAUNCH_GROUPS.forEach(g=>g.items.forEach(it=>{if(!estado[it.id])estado[it.id]=it.status;}));
+
+function renderLaunch(){
+  document.getElementById('launchChecklist').innerHTML=LAUNCH_GROUPS.map(g=>{
+    const conc=g.items.filter(it=>(estado[it.id]||'pend')==='done').length;
+    return`<div class="launch-group">
+      <div class="launch-group-title"><i class="ti ${g.icon}"></i>${g.nome}<span class="launch-progress">${conc}/${g.items.length}</span></div>
+      ${g.items.map(it=>{const s=estado[it.id]||'pend';return`<div class="item s-${s}" onclick="toggle('${it.id}')"><div class="item-dot"></div><span class="item-label">${it.label}</span><span class="item-badge">${LABELS[s]}</span></div>`;}).join('')}
+    </div>`;
+  }).join('');
+}
+
 let notas=JSON.parse(localStorage.getItem('avrs_notas')||'[]');
 PILARES.forEach(p=>p.items.forEach(it=>{if(!estado[it.id])estado[it.id]=it.status;}));
 INPI_ITEMS.forEach(it=>{if(!estado[it.id])estado[it.id]=it.status;});
 function salvar(){localStorage.setItem('avrs_status',JSON.stringify(estado));}
-function toggle(id){const atual=estado[id]||'pend';estado[id]=CICLOS[(CICLOS.indexOf(atual)+1)%CICLOS.length];salvar();render();}
+function toggle(id){const atual=estado[id]||'pend';estado[id]=CICLOS[(CICLOS.indexOf(atual)+1)%CICLOS.length];salvar();render();renderLaunch();}
 function render(){
   document.getElementById('pilares').innerHTML=PILARES.map(p=>`<div class="pilar"><div class="pilar-header"><i class="ti ${p.icon}" style="color:var(--gold)"></i><div><div class="pilar-nome">${p.nome}</div><div class="pilar-sub">${p.sub}</div></div></div><div class="pilar-items">${p.items.map(it=>{const s=estado[it.id]||'pend';return`<div class="item s-${s}" onclick="toggle('${it.id}')"><div class="item-dot"></div><span class="item-label">${it.label}</span><span class="item-badge">${LABELS[s]}</span></div>`;}).join('')}</div></div>`).join('');
   document.getElementById('inpiItems').innerHTML=INPI_ITEMS.map(it=>{const s=estado[it.id]||'pend';return`<div class="item s-${s}" onclick="toggle('${it.id}')"><div class="item-dot"></div><span class="item-label">${it.label}</span><span class="item-badge">${LABELS[s]}</span></div>`;}).join('');
@@ -589,7 +635,7 @@ function addNota(){const input=document.getElementById('notaInput');const texto=
 function delNota(id){notas=notas.filter(n=>n.id!==id);localStorage.setItem('avrs_notas',JSON.stringify(notas));renderNotas();}
 function renderNotas(){const el=document.getElementById('notasList');if(!notas.length){el.innerHTML='<div class="notas-vazia">Nenhuma anotação ainda.</div>';return;}el.innerHTML=notas.map(n=>`<div class="nota-item"><span class="nota-data">${n.data}</span><span class="nota-texto">${n.texto}</span><button class="nota-del" onclick="delNota(${n.id})"><i class="ti ti-x"></i></button></div>`).join('');}
 function renderDate(){const d=new Date();document.getElementById('headerDate').textContent=d.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});}
-render();renderNotas();renderDate();
+render();renderLaunch();renderNotas();renderDate();
 </script>
 
 </div><!-- end cockpit-content -->
@@ -629,3 +675,4 @@ if (sessionStorage.getItem(SESSION_KEY) === '1') {
 
 </body>
 </html>
+
