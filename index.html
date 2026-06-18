@@ -582,6 +582,7 @@ const INPI_ITEMS=[
 ];
 const SEQ=[{label:'Livro'},{label:'Palestra'},{label:'App'},{label:'INPI 🔒'},{label:'Escala'}];
 
+let estado=JSON.parse(localStorage.getItem('avrs_status')||'{}');
 const LAUNCH_GROUPS=[
   {id:'lc_content',nome:'Conteúdo & App',icon:'ti-device-mobile',items:[
     {id:'lc1',label:'Manual do app — revisar e atualizar conteúdo',status:'pend'},
