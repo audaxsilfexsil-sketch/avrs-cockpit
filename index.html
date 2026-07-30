@@ -107,6 +107,13 @@ body { background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;
 .eco-img-wrap img { width:100%;border-radius:8px;display:block; }
 .eco-img-caption { padding:10px 16px;font-size:11px;color:var(--text3);font-style:italic;text-align:center;border-top:1px solid var(--border); }
 
+/* FILTRO DE ÁREA */
+.area-filter { display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap; }
+.area-chip { background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:11px;color:var(--text3);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;letter-spacing:.02em; }
+.area-chip:hover { border-color:var(--border2);color:var(--text2); }
+.area-chip.active { background:rgba(212,184,122,.12);border-color:var(--border2);color:var(--gold);font-weight:500; }
+.pilar-area-tag { font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);border:1px solid var(--border2);border-radius:20px;padding:1px 7px;margin-left:8px;vertical-align:middle;background:rgba(212,184,122,.08); }
+
 /* FRASE DO ECOSSISTEMA */
 .eco-frase-card { background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:20px 24px;position:relative;overflow:hidden; }
 .eco-frase-card::before { content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent); }
@@ -674,7 +681,12 @@ body { background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;
 
   <!-- TRÍADE -->
   <div class="section">
-    <div class="section-title"><i class="ti ti-layout-grid"></i> Tríade de implementação</div>
+    <div class="section-title"><i class="ti ti-layout-grid"></i> Projetos por área</div>
+    <div class="area-filter" id="areaFilter">
+      <button class="area-chip" data-area="avrs" onclick="setArea('avrs')">AVR–S</button>
+      <button class="area-chip" data-area="audax" onclick="setArea('audax')">Audax · Operação</button>
+      <button class="area-chip" data-area="all" onclick="setArea('all')">Todas</button>
+    </div>
     <div class="pilares" id="pilares"></div>
   </div>
 
@@ -780,8 +792,15 @@ const PILARES=[
     {id:'tc2',label:'Governança certificação (TCA-013)',status:'done'},
     {id:'tc3',label:'Registro público no site',status:'pend'},
     {id:'tc4',label:'Bandeira e selo da Fundação',status:'pend'},
+  ]},
+  {id:'audax_demandas',area:'audax',nome:'Gestão de Demandas',sub:'Audax · Operação — cobranças & Alterdata',icon:'ti-inbox',items:[
+    {id:'ax1',label:'Fase 1 — Planilha de captura entregue',status:'done'},
+    {id:'ax2',label:'Fase 2 — Captura assistida por áudio (Worker)',status:'pend'},
+    {id:'ax3',label:'Fase 3 — Conversor Alterdata (lançamentos)',status:'pend'},
   ]}
 ];
+// Área padrão: todo pilar sem 'area' definida pertence ao AVR-S
+PILARES.forEach(p=>{ if(!p.area) p.area='avrs'; });
 const INPI_ITEMS=[
   {id:'i1',label:'Busca prévia no e-INPI',status:'done'},
   {id:'i2',label:'Pedido Classe 41 — Educação',status:'done'},
@@ -831,10 +850,14 @@ PILARES.forEach(p=>p.items.forEach(it=>{if(!estado[it.id])estado[it.id]=it.statu
 INPI_ITEMS.forEach(it=>{if(!estado[it.id])estado[it.id]=it.status;});
 function salvar(){localStorage.setItem('avrs_status',JSON.stringify(estado));}
 function toggle(id){const atual=estado[id]||'pend';estado[id]=CICLOS[(CICLOS.indexOf(atual)+1)%CICLOS.length];salvar();render();renderLaunch();}
+let areaAtiva=localStorage.getItem('avrs_area_filtro')||'avrs';
+function setArea(a){ areaAtiva=a; localStorage.setItem('avrs_area_filtro',a); document.querySelectorAll('.area-chip').forEach(c=>c.classList.toggle('active',c.dataset.area===a)); render(); }
 function render(){
-  document.getElementById('pilares').innerHTML=PILARES.map(p=>`<div class="pilar"><div class="pilar-header"><i class="ti ${p.icon}" style="color:var(--gold)"></i><div><div class="pilar-nome">${p.nome}</div><div class="pilar-sub">${p.sub}</div></div></div><div class="pilar-items">${p.items.map(it=>{const s=estado[it.id]||'pend';return`<div class="item s-${s}" onclick="toggle('${it.id}')"><div class="item-dot"></div><span class="item-label">${it.label}</span><span class="item-badge">${LABELS[s]}</span></div>`;}).join('')}</div></div>`).join('');
+  const visiveis=PILARES.filter(p=> areaAtiva==='all' ? true : (p.area||'avrs')===areaAtiva);
+  document.getElementById('pilares').innerHTML=visiveis.map(p=>{const tag=p.area==='audax'?`<span class="pilar-area-tag">Audax</span>`:'';return`<div class="pilar"><div class="pilar-header"><i class="ti ${p.icon}" style="color:var(--gold)"></i><div><div class="pilar-nome">${p.nome}${tag}</div><div class="pilar-sub">${p.sub}</div></div></div><div class="pilar-items">${p.items.map(it=>{const s=estado[it.id]||'pend';return`<div class="item s-${s}" onclick="toggle('${it.id}')"><div class="item-dot"></div><span class="item-label">${it.label}</span><span class="item-badge">${LABELS[s]}</span></div>`;}).join('')}</div></div>`;}).join('');
   document.getElementById('inpiItems').innerHTML=INPI_ITEMS.map(it=>{const s=estado[it.id]||'pend';return`<div class="item s-${s}" onclick="toggle('${it.id}')"><div class="item-dot"></div><span class="item-label">${it.label}</span><span class="item-badge">${LABELS[s]}</span></div>`;}).join('');
-  const todos=[...PILARES.flatMap(p=>p.items),...INPI_ITEMS];
+  // Progresso e sequência contam SOMENTE o AVR-S — a Audax fica apartada
+  const todos=[...PILARES.filter(p=>(p.area||'avrs')==='avrs').flatMap(p=>p.items),...INPI_ITEMS];
   const conc=todos.filter(it=>(estado[it.id]||it.status)==='done').length;
   const pct=Math.round(conc/todos.length*100);
   document.getElementById('progressPill').textContent=pct+'% concluído';
@@ -844,6 +867,7 @@ function addNota(){const input=document.getElementById('notaInput');const texto=
 function delNota(id){notas=notas.filter(n=>n.id!==id);localStorage.setItem('avrs_notas',JSON.stringify(notas));renderNotas();}
 function renderNotas(){const el=document.getElementById('notasList');if(!notas.length){el.innerHTML='<div class="notas-vazia">Nenhuma anotação ainda.</div>';return;}el.innerHTML=notas.map(n=>`<div class="nota-item"><span class="nota-data">${n.data}</span><span class="nota-texto">${n.texto}</span><button class="nota-del" onclick="delNota(${n.id})"><i class="ti ti-x"></i></button></div>`).join('');}
 function renderDate(){const d=new Date();document.getElementById('headerDate').textContent=d.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});}
+document.querySelectorAll('.area-chip').forEach(c=>c.classList.toggle('active',c.dataset.area===areaAtiva));
 render();renderLaunch();renderNotas();renderDate();
 </script>
 
