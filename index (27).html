@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AVR–S · Cockpit do Projeto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+:root {
+  --bg:     #0a0908;
+  --bg2:    #121110;
+  --bg3:    #1a1816;
+  --bg4:    #222018;
+  --gold:   #d4b87a;
+  --gold2:  #ebd49e;
+  --cream:  #f5f0e8;
+  --text2:  #b8b0a4;
+  --text3:  #6a6460;
+  --border: rgba(212,184,122,.12);
+  --border2:rgba(212,184,122,.25);
+  --r:      12px;
+  --r2:     8px;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.6;min-height:100vh;-webkit-font-smoothing:antialiased; }
+.header { border-bottom:1px solid var(--border);padding:18px 24px 16px;display:flex;align-items:center;gap:16px;position:sticky;top:0;background:rgba(10,9,8,.92);backdrop-filter:blur(12px);z-index:100; }
+.header-logo { font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--gold);letter-spacing:.04em; }
+.header-sub { font-size:11px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase; }
+.header-right { margin-left:auto;display:flex;align-items:center;gap:10px; }
+.header-date { font-size:11px;color:var(--text3); }
+.progress-pill { background:rgba(212,184,122,.1);border:1px solid var(--border2);border-radius:20px;padding:4px 12px;font-size:11px;color:var(--gold);font-weight:500; }
+.main { padding:20px 24px 40px;max-width:900px;margin:0 auto; }
+.section { margin-bottom:24px; }
+.section-title { font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--text3);margin-bottom:12px;display:flex;align-items:center;gap:8px; }
+.section-title i { font-size:14px;color:var(--gold); }
+.links-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px; }
+.link-card { background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;text-decoration:none;display:flex;align-items:center;gap:10px;transition:all .2s;cursor:pointer; }
+.link-card:hover { border-color:var(--border2);background:var(--bg4);transform:translateY(-2px); }
+.link-card i { font-size:20px;color:var(--gold);flex-shrink:0; }
+.link-nome { font-size:13px;color:var(--cream);font-weight:500; }
+.link-url { font-size:10px;color:var(--text3);margin-top:1px; }
+.pilares { display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px; }
+@media(max-width:600px){ .pilares{ grid-template-columns:1fr; } }
+.pilar { background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);overflow:hidden; }
+.pilar-header { padding:14px 16px 10px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px; }
+.pilar-header i { font-size:20px;margin-top:1px; }
+.pilar-nome { font-size:14px;font-weight:500;color:var(--cream); }
+.pilar-sub { font-size:11px;color:var(--text3);margin-top:2px; }
+.pilar-items { padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px; }
+.item { display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--r2);border:1px solid var(--border);cursor:pointer;transition:all .2s;background:var(--bg2);user-select:none; }
+.item:hover { border-color:var(--border2);transform:translateY(-1px); }
+.item-dot { width:8px;height:8px;border-radius:50%;flex-shrink:0; }
+.item-label { font-size:12px;color:var(--cream);flex:1; }
+.item-badge { font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500;white-space:nowrap; }
+.s-done .item-dot { background:#d4b87a; }
+.s-done .item-badge { background:rgba(212,184,122,.12);color:var(--gold);border:1px solid var(--border2); }
+.s-prog .item-dot { background:#EF9F27; }
+.s-prog .item-badge { background:rgba(239,159,39,.12);color:#EF9F27;border:1px solid rgba(239,159,39,.3); }
+.s-pend .item-dot { background:#6a6460; }
+.s-pend .item-badge { background:rgba(106,100,96,.1);color:var(--text3);border:1px solid rgba(106,100,96,.2); }
+.inpi-card { background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;display:flex;gap:14px; }
+.inpi-card i.lock { font-size:22px;color:var(--text3);flex-shrink:0;margin-top:2px; }
+.inpi-info { flex:1; }
+.inpi-top { display:flex;align-items:center;gap:10px;margin-bottom:4px; }
+.inpi-nome { font-size:14px;font-weight:500;color:var(--cream); }
+.inpi-badge { font-size:10px;padding:2px 8px;border-radius:20px;background:rgba(106,100,96,.15);color:var(--text3);border:1px solid rgba(106,100,96,.25); }
+.inpi-sub { font-size:11px;color:var(--text3);margin-bottom:10px; }
+.inpi-items { display:flex;flex-direction:column;gap:6px; }
+.seq { display:flex;align-items:center;gap:0;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:16px 20px; }
+.seq-step { display:flex;flex-direction:column;align-items:center;gap:5px;flex:1; }
+.seq-circle { width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;border:1.5px solid var(--border2);color:var(--text3);background:var(--bg2);transition:all .3s; }
+.seq-circle.done { border-color:var(--gold);color:var(--gold);background:rgba(212,184,122,.08); }
+.seq-label { font-size:10px;color:var(--text3);white-space:nowrap; }
+.seq-arrow { flex:1;height:1px;background:var(--border);position:relative;top:-12px;max-width:40px; }
+.seq-arrow::after { content:'';position:absolute;right:-4px;top:-4px;border:4px solid transparent;border-left:6px solid var(--border); }
+.seq-pct { margin-left:16px;font-size:11px;color:var(--text3);white-space:nowrap;top:-10px;position:relative; }
+.notas-area { background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);overflow:hidden; }
+.notas-header { padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px; }
+.notas-header span { font-size:12px;font-weight:500;color:var(--text2); }
+.notas-list { padding:10px 12px;display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto; }
+.notas-list::-webkit-scrollbar { width:4px; }
+.notas-list::-webkit-scrollbar-thumb { background:var(--border2);border-radius:4px; }
+.nota-item { display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:var(--r2);background:var(--bg2);border:1px solid var(--border); }
+.nota-data { font-size:10px;color:var(--text3);white-space:nowrap;margin-top:1px; }
+.nota-texto { font-size:12px;color:var(--cream);flex:1;line-height:1.5; }
+.nota-del { background:none;border:none;cursor:pointer;color:var(--text3);font-size:14px;padding:0;flex-shrink:0; }
+.nota-del:hover { color:#d46a6a; }
+.notas-vazia { font-size:12px;color:var(--text3);text-align:center;padding:16px 0; }
+.notas-input-row { padding:10px 12px;border-top:1px solid var(--border);display:flex;gap:8px; }
+.notas-input { flex:1;border:1px solid var(--border2);border-radius:var(--r2);padding:8px 12px;font-size:12px;background:var(--bg2);color:var(--cream);font-family:'DM Sans',sans-serif;outline:none; }
+.notas-input:focus { border-color:rgba(212,184,122,.5); }
+.notas-btn { background:rgba(212,184,122,.12);border:1px solid var(--border2);border-radius:var(--r2);padding:8px 16px;font-size:12px;color:var(--gold);cursor:pointer;font-weight:500;white-space:nowrap;font-family:'DM Sans',sans-serif; }
+.notas-btn:hover { background:rgba(212,184,122,.2); }
+.legenda { display:flex;align-items:center;gap:16px;flex-wrap:wrap; }
+.leg-item { display:flex;align-items:center;gap:5px; }
+.leg-dot { width:8px;height:8px;border-radius:50%; }
+.leg-txt { font-size:11px;color:var(--text3); }
+.footer { text-align:center;padding:20px;border-top:1px solid var(--border);font-size:11px;color:var(--text3);line-height:1.8; }
+
+/* ECOSSISTEMA */
+.eco-img-card { background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);overflow:hidden; }
+.eco-img-header { padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px; }
+.eco-img-header span { font-size:12px;font-weight:500;color:var(--text2); }
+.eco-img-wrap { padding:16px;background:var(--bg2); }
+.eco-img-wrap img { width:100%;border-radius:8px;display:block; }
+.eco-img-caption { padding:10px 16px;font-size:11px;color:var(--text3);font-style:italic;text-align:center;border-top:1px solid var(--border); }
+
+/* FRASE DO ECOSSISTEMA */
+.eco-frase-card { background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:20px 24px;position:relative;overflow:hidden; }
+.eco-frase-card::before { content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent); }
+.eco-frase-linhas { display:flex;flex-direction:column;gap:6px; }
+.eco-frase-linha { display:flex;align-items:baseline;gap:10px; }
+.eco-frase-num { font-size:10px;color:var(--text3);width:14px;flex-shrink:0;font-variant-numeric:tabular-nums; }
+.eco-frase-texto { font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:300;color:var(--cream);line-height:1.4; }
+.eco-frase-texto span { color:var(--gold);font-weight:400; }
+.eco-frase-rodape { margin-top:14px;padding-top:12px;border-top:1px solid var(--border);font-size:11px;color:var(--text3);font-style:italic; }
+
+/* RESUMO DO LIVRO */
+.livro-card { background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);overflow:hidden; }
+.livro-header { padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between; }
+.livro-titulo { font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:400;color:var(--cream); }
+.livro-subtitulo { font-size:11px;color:var(--text3);margin-top:2px; }
+.livro-badge { font-size:10px;padding:3px 10px;border-radius:20px;background:rgba(212,184,122,.1);color:var(--gold);border:1px solid var(--border2);white-space:nowrap; }
+.livro-corpo { padding:16px 18px;display:flex;flex-direction:column;gap:14px; }
+.livro-fio { font-size:13px;color:var(--text2);line-height:1.7;border-left:2px solid var(--gold);padding-left:12px; }
+.livro-metodo { display:grid;grid-template-columns:repeat(5,1fr);gap:8px; }
+@media(max-width:500px){ .livro-metodo{ grid-template-columns:1fr 1fr; } }
+.livro-letra { background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:10px 8px;text-align:center; }
+.livro-letra-char { font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--gold);display:block; }
+.livro-letra-nome { font-size:10px;color:var(--text3);margin-top:2px; }
+.livro-premissa { font-size:12px;color:var(--text3);font-style:italic;line-height:1.6;text-align:center;padding:0 8px; }
+.livro-divisor { height:1px;background:var(--border); }
+
+/* MATERIAIS DO PROJETO */
+.mat-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px; }
+.mat-card { background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:10px;transition:border-color .2s,transform .2s; }
+.mat-card:hover { border-color:var(--border2);transform:translateY(-2px); }
+.mat-header { display:flex;align-items:flex-start;gap:10px; }
+.mat-icon-wrap { width:36px;height:36px;border-radius:var(--r2);background:rgba(212,184,122,.1);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0; }
+.mat-icon-wrap i { font-size:18px;color:var(--gold); }
+.mat-meta { flex:1;min-width:0; }
+.mat-nome { font-size:13px;font-weight:500;color:var(--cream); }
+.mat-sub { font-size:11px;color:var(--text3);margin-top:2px; }
+.mat-badge { font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500;white-space:nowrap;flex-shrink:0; }
+.mat-badge-pptx { background:rgba(239,159,39,.12);color:#EF9F27;border:1px solid rgba(239,159,39,.3); }
+.mat-badge-docx { background:rgba(100,149,237,.12);color:#6495ED;border:1px solid rgba(100,149,237,.3); }
+.mat-desc { font-size:12px;color:var(--text2);line-height:1.6;flex:1; }
+.mat-footer { display:flex;align-items:center;justify-content:space-between;padding-top:8px;border-top:1px solid var(--border); }
+.mat-tag { font-size:11px;color:var(--text3);display:flex;align-items:center;gap:4px; }
+.mat-tag i { font-size:13px; }
+.mat-btn { background:rgba(212,184,122,.1);border:1px solid var(--border2);border-radius:var(--r2);padding:6px 14px;font-size:11px;color:var(--gold);cursor:pointer;font-weight:500;text-decoration:none;display:flex;align-items:center;gap:5px;transition:background .2s; }
+.mat-btn:hover { background:rgba(212,184,122,.2); }
+@media(max-width:500px){ .mat-grid{ grid-template-columns:1fr; } }
+@media print { .mat-btn{ display:none; } }
+
+/* CHECKLIST LANÇAMENTO */
+.launch-group { background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:10px; }
+.launch-group-title { font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;display:flex;align-items:center;gap:6px; }
+.launch-group-title i { font-size:14px; }
+.launch-progress { font-size:10px;color:var(--text3);margin-left:auto;font-weight:normal;letter-spacing:0;text-transform:none; }
+
+@media(max-width:500px){.main{padding:14px 14px 40px;}.header{padding:14px 16px;}.links-grid{grid-template-columns:1fr 1fr;}.seq{padding:12px 10px;}.seq-circle{width:30px;height:30px;font-size:11px;}}
+@media print{body{background:#fff;color:#111;}.header{background:#fff;position:relative;border-bottom:1px solid #ddd;}.header-logo{color:#8a6830;}.link-card,.pilar,.inpi-card,.seq,.notas-area{background:#fafafa!important;border-color:#ddd!important;break-inside:avoid;}.pilar-nome,.item-label,.link-nome,.inpi-nome{color:#111!important;}.notas-input-row{display:none;}.nota-del{display:none;}.footer{border-top:1px solid #ddd;color:#aaa;}}
+
+/* LOGIN OVERLAY */
+#login-overlay {
+  position:fixed;inset:0;background:#080808;display:flex;align-items:center;
+  justify-content:center;z-index:9999;
+}
+#login-box {
+  background:#121110;border:1px solid rgba(212,184,122,.25);border-radius:16px;
+  padding:40px 36px;width:100%;max-width:360px;display:flex;flex-direction:column;gap:20px;
+}
+.login-logo {
+  font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;
+  color:#d4b87a;letter-spacing:.06em;text-align:center;
+}
+.login-sub {
+  font-size:11px;color:#6a6460;letter-spacing:.12em;text-transform:uppercase;
+  text-align:center;margin-top:-12px;
+}
+.login-label {
+  font-size:11px;color:#6a6460;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;
+}
+.login-input {
+  width:100%;border:1px solid rgba(212,184,122,.25);border-radius:8px;
+  padding:10px 14px;font-size:14px;background:#0a0908;color:#f5f0e8;
+  font-family:'DM Sans',sans-serif;outline:none;box-sizing:border-box;
+}
+.login-input:focus { border-color:rgba(212,184,122,.5); }
+.login-field + .login-field { margin-top:-8px; }
+#login-btn:disabled { opacity:.5;cursor:default; }
+#login-forgot {
+  background:none;border:0;padding:0;font-size:12px;color:#8a8278;cursor:pointer;
+  font-family:'DM Sans',sans-serif;text-decoration:underline;text-underline-offset:3px;
+  align-self:center;margin-top:-8px;
+}
+#login-forgot:hover { color:#d4b87a; }
+#login-msg { font-size:12px;color:#9cc79f;text-align:center;display:none;line-height:1.5; }
+#login-checking { font-size:12px;color:#6a6460;text-align:center; }
+#login-form { display:none;flex-direction:column;gap:20px; }
+.btn-sair {
+  background:none;border:1px solid rgba(212,184,122,.25);border-radius:8px;padding:5px 10px;
+  font-size:11px;color:#a89f94;cursor:pointer;font-family:'DM Sans',sans-serif;
+}
+.btn-sair:hover { color:#d4b87a;border-color:rgba(212,184,122,.5); }
+@media print { .btn-sair { display:none; } }
+#login-btn {
+  background:rgba(212,184,122,.12);border:1px solid rgba(212,184,122,.3);
+  border-radius:8px;padding:11px 0;font-size:13px;font-weight:500;
+  color:#d4b87a;cursor:pointer;font-family:'DM Sans',sans-serif;
+  letter-spacing:.04em;transition:background .2s;
+}
+#login-btn:hover { background:rgba(212,184,122,.22); }
+#login-err {
+  font-size:12px;color:#d46a6a;text-align:center;display:none;
+}
+#cockpit-content { display:none; }
+
+</style>
+<style id="evo-css">
+#evo-panel{--bg:#121110;--bg2:#1a1816;--bg3:#222018;--line:rgba(212,184,122,.16);--line2:rgba(245,240,232,.08);--text:#f5f0e8;--text2:#c9c1b4;--text3:#8f877b;--gold:#d4b87a;--gold2:#ebd49e;--goldink:#1a1408;--serif:'Cormorant Garamond',Georgia,'Times New Roman',serif;--sans:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.55}
+#evo-panel *,#evo-panel *::before,#evo-panel *::after{box-sizing:border-box}
+#evo-panel .evo-main{padding:8px 0 20px!important;max-width:none!important}
+#evo-panel h1{font-size:clamp(30px,5vw,40px)!important}
+#evo-panel .evo-load{color:var(--text3);font-size:14px;padding:20px 0}
+#evo-panel .evo-main{max-width:980px;margin:0 auto;padding:40px 22px 80px}
+#evo-panel h1,#evo-panel h2{font-family:var(--serif);font-weight:500;letter-spacing:-.01em;margin:0}
+#evo-panel h1{font-size:clamp(38px,7vw,58px);line-height:1.02}
+#evo-panel h2{font-size:clamp(28px,4.4vw,36px);line-height:1.1;margin-bottom:6px}
+#evo-panel p{margin:0}
+#evo-panel .lead{color:var(--text2);max-width:60ch;margin-top:14px}
+#evo-panel .muted{color:var(--text3);font-size:14px}
+#evo-panel section{padding:56px 0 0}
+#evo-panel section+section{border-top:1px solid var(--line2);margin-top:56px}
+#evo-panel nav.jump{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:22px;font-size:14px}
+#evo-panel nav.jump a{color:var(--gold);text-decoration:none;border-bottom:1px solid transparent}
+#evo-panel nav.jump a:hover{border-bottom-color:var(--gold)}
+#evo-panel a:focus-visible,#evo-panel button:focus-visible,#evo-panel select:focus-visible,#evo-panel input:focus-visible,#evo-panel summary:focus-visible{outline:2px solid var(--gold2);outline-offset:3px;border-radius:4px}
+#evo-panel .regua{margin-top:38px}
+#evo-panel .regua svg{width:100%;height:auto;display:block;overflow:visible}
+#evo-panel .regua .num{font-family:var(--serif);font-size:32px;fill:var(--gold2)}
+#evo-panel .regua .lbl{font-size:13px;fill:var(--text3);font-family:var(--sans)}
+#evo-panel .regua .lblb{font-size:14px;fill:var(--text2);font-family:var(--sans)}
+#evo-panel .facts{display:flex;flex-wrap:wrap;gap:10px 36px;margin-top:22px}
+#evo-panel .fact b{display:block;font-family:var(--serif);font-weight:500;font-size:28px;color:var(--text);line-height:1.1}
+#evo-panel .fact span{font-size:13.5px;color:var(--text3)}
+#evo-panel .chart{margin-top:26px}
+#evo-panel .chart svg{width:100%;height:auto;display:block}
+#evo-panel .legend{display:flex;flex-wrap:wrap;gap:6px 22px;margin-top:10px;font-size:13.5px;color:var(--text2)}
+#evo-panel .legend i{display:inline-block;width:22px;height:0;border-top:2px solid var(--gold);vertical-align:middle;margin-right:7px}
+#evo-panel .legend i.g{border-top-color:var(--text2)}
+#evo-panel .legend i.r{border-top:2px dashed var(--text3)}
+#evo-panel .note{margin-top:10px;font-size:13.5px;color:var(--text3)}
+#evo-panel .bars{margin-top:30px;display:grid;gap:14px}
+#evo-panel .bar-row{display:grid;grid-template-columns:minmax(120px,210px) 1fr;gap:6px 16px;align-items:center}
+#evo-panel .bar-row .nm{font-size:14px;color:var(--text2);line-height:1.3}
+#evo-panel .track{position:relative;display:grid;gap:4px}
+#evo-panel .b{height:9px;border-radius:5px;background:var(--line);position:relative}
+#evo-panel .b span{position:absolute;inset:0 auto 0 0;border-radius:5px}
+#evo-panel .b.p span{background:var(--text3);opacity:.55}
+#evo-panel .b.u span{background:var(--gold)}
+#evo-panel .mt{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--text);border-radius:1px}
+#evo-panel .bar-head .k em.m::before{width:2px;height:12px;border-radius:1px;background:var(--text)}
+#evo-panel th.mt-h,#evo-panel td.mt-c{color:var(--text3)}
+#evo-panel .legend i.m{border-top:2px dashed var(--gold2)}
+#evo-panel .delta{font-size:12.5px;color:var(--gold2);white-space:nowrap}
+#evo-panel .bar-head{display:grid;grid-template-columns:minmax(120px,210px) 1fr;gap:16px;font-size:12.5px;color:var(--text3)}
+#evo-panel .bar-head .k{display:flex;gap:16px}
+#evo-panel .bar-head .k em{font-style:normal;display:inline-flex;align-items:center;gap:6px}
+#evo-panel .bar-head .k em::before{content:"";width:14px;height:7px;border-radius:4px;background:var(--gold)}
+#evo-panel .bar-head .k em.p::before{background:var(--text3);opacity:.55}
+#evo-panel .scroll{overflow-x:auto;margin-top:24px;-webkit-overflow-scrolling:touch}
+#evo-panel table{border-collapse:collapse;min-width:760px;width:100%;font-size:14px}
+#evo-panel th,#evo-panel td{padding:9px 8px;text-align:center;border-bottom:1px solid var(--line2)}
+#evo-panel th{font-weight:500;color:var(--text2);font-size:13px;vertical-align:bottom}
+#evo-panel th:first-child,#evo-panel td:first-child{text-align:left;padding-left:0}
+#evo-panel td:first-child{color:var(--text2)}
+#evo-panel th button{all:unset;cursor:pointer;color:var(--text2);border-bottom:1px dotted var(--text3)}
+#evo-panel th button[aria-pressed="true"]{color:var(--gold2);border-bottom-color:var(--gold2)}
+#evo-panel th.me{color:var(--gold2)}
+#evo-panel td.me{font-weight:600;color:var(--text)}
+#evo-panel td .cell{display:inline-block;min-width:34px;padding:3px 0;border-radius:6px}
+#evo-panel td.me .cell{outline:1px solid var(--gold)}
+#evo-panel .grp td{padding-top:20px;font-size:12.5px;color:var(--text3);border-bottom:none;text-align:left}
+#evo-panel .base{margin-top:16px;padding:16px 18px;border-left:2px solid var(--gold);background:var(--bg2);border-radius:0 8px 8px 0;max-width:70ch}
+#evo-panel .base b{font-family:var(--serif);font-size:20px;font-weight:500}
+#evo-panel form{margin-top:24px}
+#evo-panel .row2{display:grid;grid-template-columns:180px 1fr;gap:14px}
+#evo-panel label{display:block;font-size:13.5px;color:var(--text2);margin-bottom:6px}
+#evo-panel input[type=date],#evo-panel input[type=text],#evo-panel select{width:100%;font:inherit;font-size:15px;color:var(--text);background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+#evo-panel .dims{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px 18px;margin-top:22px}
+#evo-panel .dim{display:grid;grid-template-columns:1fr 74px;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line2)}
+#evo-panel .dim label{margin:0;font-size:14px;color:var(--text)}
+#evo-panel .dim small{display:block;color:var(--text3);font-size:12px}
+#evo-panel .actions{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:center;margin-top:26px}
+#evo-panel .btn{font:inherit;font-weight:600;font-size:15px;border:none;border-radius:22px;padding:12px 26px;cursor:pointer;background:var(--gold);color:var(--goldink)}
+#evo-panel .btn[disabled]{opacity:.5;cursor:default}
+#evo-panel .link{font:inherit;font-size:14px;background:none;border:none;color:var(--text3);cursor:pointer;text-decoration:underline;padding:4px}
+#evo-panel #status{font-size:14px;color:var(--text2)}
+#evo-panel #status.err{color:#e08a7a}
+#evo-panel ol.hist{list-style:none;padding:0;margin:26px 0 0;display:grid;gap:8px}
+#evo-panel ol.hist li{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:14.5px;padding:10px 0;border-bottom:1px solid var(--line2)}
+#evo-panel ol.hist b{font-weight:500;min-width:88px}
+#evo-panel ol.hist .v{color:var(--gold2);margin-left:auto}
+#evo-panel dl.regua-t{display:grid;grid-template-columns:80px 1fr;gap:10px 18px;margin:22px 0 0;max-width:70ch}
+#evo-panel dl.regua-t dt{font-family:var(--serif);font-size:22px;color:var(--gold2);line-height:1.2}
+#evo-panel dl.regua-t dd{margin:0;color:var(--text2)}
+#evo-panel ul.lim{margin:22px 0 0;padding-left:18px;color:var(--text2);max-width:70ch}
+#evo-panel ul.lim li{margin-bottom:8px}
+@media (max-width:620px){#evo-panel .row2{grid-template-columns:1fr}
+#evo-panel .bar-row,#evo-panel .bar-head{grid-template-columns:1fr}
+#evo-panel .evo-main{padding-top:28px}}
+
+@media (prefers-reduced-motion:no-preference){#evo-panel .regua .atual{transition:transform .6s ease}}
+
+</style>
+</head>
+<body>
+
+<div id="login-overlay">
+  <div id="login-box">
+    <div>
+      <div class="login-logo">AVR–S</div>
+      <div class="login-sub">Cockpit do Projeto · Área Restrita</div>
+    </div>
+    <div id="login-checking">Verificando acesso…</div>
+    <div id="login-form">
+      <div class="login-field">
+        <div class="login-label">E-mail</div>
+        <input type="email" id="login-email" class="login-input" autocomplete="username" placeholder="seu@email.com" />
+      </div>
+      <div class="login-field">
+        <div class="login-label">Senha</div>
+        <input type="password" id="login-pass" class="login-input" autocomplete="current-password" placeholder="••••••••••••" />
+      </div>
+      <button id="login-btn" type="button">Entrar</button>
+      <button id="login-forgot" type="button">Esqueci a senha</button>
+      <div id="login-err"></div>
+      <div id="login-msg"></div>
+    </div>
+  </div>
+</div>
+
+<div id="cockpit-content">
+
+<header class="header">
+  <div>
+    <div class="header-logo">AVR–S</div>
+    <div class="header-sub">Cockpit do Projeto · Audax Consultoria</div>
+  </div>
+  <div class="header-right">
+    <span class="header-date" id="headerDate"></span>
+    <span class="progress-pill" id="progressPill">0%</span>
+    <button class="btn-sair" id="btn-sair" type="button">Sair</button>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- LINKS RÁPIDOS -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-bolt"></i> Acesso rápido</div>
+    <div class="links-grid">
+      <a class="link-card" href="https://audaxsilfexsil-sketch.github.io/avrs-app-" target="_blank"><i class="ti ti-device-mobile"></i><div class="link-info"><div class="link-nome">App AVR–S</div><div class="link-url">github.io/avrs-app-</div></div></a>
+      <a class="link-card" href="https://github.com/audaxsilfexsil-sketch/avrs-app-" target="_blank"><i class="ti ti-brand-github"></i><div class="link-info"><div class="link-nome">Repositório</div><div class="link-url">github.com</div></div></a>
+      <a class="link-card" href="https://pag.ae/82d932ew3" target="_blank"><i class="ti ti-credit-card"></i><div class="link-info"><div class="link-nome">PagBank Pro (cartão)</div><div class="link-url">R$ 39,99/mês</div></div></a>
+      <a class="link-card" href="https://avrs-proxy.audax-silfexsil.workers.dev" target="_blank"><i class="ti ti-cloud"></i><div class="link-info"><div class="link-nome">Worker IA</div><div class="link-url">Cloudflare</div></div></a>
+      <a class="link-card" href="https://console.firebase.google.com" target="_blank"><i class="ti ti-database"></i><div class="link-info"><div class="link-nome">Firebase</div><div class="link-url">avrs-app · southamerica</div></div></a>
+      <a class="link-card" href="https://inpi.gov.br" target="_blank"><i class="ti ti-shield-lock"></i><div class="link-info"><div class="link-nome">INPI</div><div class="link-url">inpi.gov.br</div></div></a>
+      <div class="link-card" onclick="window.location='mailto:audax.silfexsil@gmail.com'"><i class="ti ti-mail"></i><div class="link-info"><div class="link-nome">E-mail</div><div class="link-url">audax.silfexsil@gmail.com</div></div></div>
+      <a class="link-card" href="https://audaxsilfexsil-sketch.github.io/avrs-cockpit/" target="_blank"><i class="ti ti-layout-dashboard"></i><div class="link-info"><div class="link-nome">Este Cockpit</div><div class="link-url">github.io/avrs-cockpit</div></div></a>
+      <div class="link-card" onclick="window.location='https://wa.me/5521964164234'"><i class="ti ti-brand-whatsapp"></i><div class="link-info"><div class="link-nome">WhatsApp</div><div class="link-url">(21) 96416-4234</div></div></div>
+    </div>
+  </div>
+
+  <!-- MÉTODO -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-circle-letter-a"></i> Método central</div>
+    <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:16px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+      <div style="flex:1;min-width:200px">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--gold)">AVR–S</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px">A Vida Sem Rascunho · Consciência e Decisão</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">Audax Consultoria · CNPJ 33.344.650/0001-03</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <span style="background:rgba(212,184,122,.1);border:1px solid var(--border2);border-radius:20px;padding:4px 12px;font-size:11px;color:var(--gold)">Regular</span>
+        <span style="background:rgba(212,184,122,.1);border:1px solid var(--border2);border-radius:20px;padding:4px 12px;font-size:11px;color:var(--gold)">Atenção</span>
+        <span style="background:rgba(212,184,122,.1);border:1px solid var(--border2);border-radius:20px;padding:4px 12px;font-size:11px;color:var(--gold)">Visão</span>
+        <span style="background:rgba(212,184,122,.1);border:1px solid var(--border2);border-radius:20px;padding:4px 12px;font-size:11px;color:var(--gold)">Resposta</span>
+        <span style="background:rgba(212,184,122,.1);border:1px solid var(--border2);border-radius:20px;padding:4px 12px;font-size:11px;color:var(--gold)">Sistema</span>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- BANNER MASTER -->
+  <div class="section">
+    <div class="eco-img-card" style="border-color:var(--border2)">
+      <div class="eco-img-wrap" style="padding:0;background:var(--bg)">
+        <img src="AVR-S_Banner_Master.png" alt="AVR–S Banner Master" style="width:100%;border-radius:var(--r);display:block;" loading="lazy"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- FRASE DO ECOSSISTEMA -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-quote"></i> O ecossistema em 5 linhas</div>
+    <div class="eco-frase-card">
+      <div class="eco-frase-linhas">
+        <div class="eco-frase-linha"><span class="eco-frase-num">1</span><span class="eco-frase-texto">Os <span>livros</span> explicam.</span></div>
+        <div class="eco-frase-linha"><span class="eco-frase-num">2</span><span class="eco-frase-texto">O <span>workshop</span> demonstra.</span></div>
+        <div class="eco-frase-linha"><span class="eco-frase-num">3</span><span class="eco-frase-texto">O <span>aplicativo</span> pratica.</span></div>
+        <div class="eco-frase-linha"><span class="eco-frase-num">4</span><span class="eco-frase-texto">O <span>cockpit</span> acompanha.</span></div>
+        <div class="eco-frase-linha"><span class="eco-frase-num">5</span><span class="eco-frase-texto">O <span>AVR–S</span> transforma.</span></div>
+      </div>
+      <div class="eco-frase-rodape">Cada elemento no seu papel · cada um completando o anterior · Audax Consultoria</div>
+    </div>
+  </div>
+
+  <!-- ECOSSISTEMA AVR-S (IMAGEM) -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-circles-relation"></i> Ecossistema AVR–S</div>
+    <div class="eco-img-card">
+      <div class="eco-img-header">
+        <i class="ti ti-map" style="font-size:15px;color:var(--text3)"></i>
+        <span>Mapa completo do ecossistema · Audax Consultoria</span>
+      </div>
+      <div class="eco-img-wrap">
+        <img src="AVR-S%20%20ECOSSISTEMA.png" alt="Ecossistema AVR–S" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/>
+        <div style="display:none;font-size:12px;color:var(--text3);text-align:center;padding:20px 0">Imagem não encontrada — adicione AVR-S__ECOSSISTEMA.png ao repositório</div>
+      </div>
+      <div class="eco-img-caption">O ecossistema AVR–S conecta origem, consciência, prática e multiplicação em um ciclo contínuo de transformação.</div>
+    </div>
+  </div>
+
+  <!-- VISÃO DE PLATAFORMA · APP CCR -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-layout-dashboard"></i> Visão de Plataforma · App CCR</div>
+    <div class="eco-img-card">
+      <div class="eco-img-header">
+        <i class="ti ti-target-arrow" style="font-size:15px;color:var(--gold)"></i>
+        <span>Dashboard "Seu Campo" · norte de longo prazo</span>
+      </div>
+      <div class="eco-img-wrap">
+        <img src="CCR_Plataforma_Mockup.png" alt="Mockup da plataforma App CCR — dashboard Seu Campo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/>
+        <div style="display:none;font-size:12px;color:var(--text3);text-align:center;padding:20px 0">Imagem não encontrada — adicione CCR_Plataforma_Mockup.png ao repositório</div>
+      </div>
+      <div class="eco-img-caption">Norte de longo prazo do App CCR — parqueado pós-lançamento. O protótipo navegável (campo.html) valida a visão; a construção real é pós-Trilogia. Prioridade absoluta continua Trilogia (17/09) + Finance.</div>
+    </div>
+  </div>
+
+  <!-- RESUMO DO LIVRO -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-book"></i> Sobre o livro · A Vida Sem Rascunho</div>
+    <div class="livro-card">
+      <div class="livro-header">
+        <div>
+          <div class="livro-titulo">A Vida Sem Rascunho</div>
+          <div class="livro-subtitulo">Consciência, Decisão e o Protocolo AVR–S · André Silfexsil · Audax Consultoria</div>
+        </div>
+        <span class="livro-badge">📖 Resumo</span>
+      </div>
+      <div class="livro-corpo">
+        <p class="livro-fio">Vivemos em modo rascunho — adiando escolhas, reagindo sem consciência, acumulando arrependimentos. Este livro propõe uma ruptura: parar de viver como se houvesse uma segunda versão.</p>
+        <div class="livro-divisor"></div>
+        <div>
+          <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">O Protocolo · 5 camadas de decisão consciente</div>
+          <div class="livro-metodo">
+            <div class="livro-letra"><span class="livro-letra-char">R</span><span class="livro-letra-nome">Regular</span></div>
+            <div class="livro-letra"><span class="livro-letra-char">A</span><span class="livro-letra-nome">Atenção</span></div>
+            <div class="livro-letra"><span class="livro-letra-char">V</span><span class="livro-letra-nome">Visão</span></div>
+            <div class="livro-letra"><span class="livro-letra-char">R</span><span class="livro-letra-nome">Resposta</span></div>
+            <div class="livro-letra"><span class="livro-letra-char">S</span><span class="livro-letra-nome">Sistema</span></div>
+          </div>
+        </div>
+        <div class="livro-divisor"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:12px 14px;">
+            <div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;">O que o livro entrega</div>
+            <ul style="list-style:none;display:flex;flex-direction:column;gap:5px;">
+              <li style="font-size:12px;color:var(--text2);display:flex;gap:6px;"><span style="color:var(--gold)">→</span> Framework de decisão replicável</li>
+              <li style="font-size:12px;color:var(--text2);display:flex;gap:6px;"><span style="color:var(--gold)">→</span> Diagnóstico de distorções internas</li>
+              <li style="font-size:12px;color:var(--text2);display:flex;gap:6px;"><span style="color:var(--gold)">→</span> Separação Fato × História × Projeção</li>
+              <li style="font-size:12px;color:var(--text2);display:flex;gap:6px;"><span style="color:var(--gold)">→</span> As 8 camadas do protocolo completo</li>
+              <li style="font-size:12px;color:var(--text2);display:flex;gap:6px;"><span style="color:var(--gold)">→</span> Casos práticos de aplicação</li>
+            </ul>
+          </div>
+          <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:12px 14px;">
+            <div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;">Para quem é</div>
+            <ul style="list-style:none;display:flex;flex-direction:column;gap:5px;">
+              <li style="font-size:12px;color:var(--text2);display:flex;gap:6px;"><span style="color:var(--gold)">→</span> Líderes e gestores em transição</li>
+              <li style="font-size:12px;color:var(--text2);display:flex;gap:6px;"><span style="color:var(--gold)">→</span> Profissionais sob alta pressão</li>
+              <li style="font-size:12px;color:var(--text2);display:flex;gap:6px;"><span style="color:var(--gold)">→</span> Quem decide com emoção reativa</li>
+              <li style="font-size:12px;color:var(--text2);display:flex;gap:6px;"><span style="color:var(--gold)">→</span> Quem busca consistência interna</li>
+              <li style="font-size:12px;color:var(--text2);display:flex;gap:6px;"><span style="color:var(--gold)">→</span> Coaches e facilitadores de mudança</li>
+            </ul>
+          </div>
+        </div>
+        <div class="livro-premissa">"Toda decisão passa por três filtros invisíveis antes de existir: seu estado interno, sua estrutura mental e sua atenção. O AVR–S torna esses filtros visíveis — e governáveis."</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CAPAS DOS LIVROS -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-books"></i> Trilogia da Transformação · Capas &amp; Contracapas</div>
+
+    <!-- Livro 1 — Crônicas de um Campeão -->
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:12px;">
+      <div style="padding:12px 18px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;">
+        <div style="width:20px;height:20px;border-radius:50%;background:rgba(212,184,122,.15);border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--gold);flex-shrink:0;">1</div>
+        <div>
+          <div style="font-size:13px;font-weight:500;color:var(--cream);">Crônicas de um Campeão</div>
+          <div style="font-size:10px;color:var(--gold);letter-spacing:.06em;">O DESPERTAR DO SER · Primeiro livro da Trilogia</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:200px 1fr;gap:0;">
+        <!-- Capa -->
+        <div style="border-right:1px solid var(--border);display:flex;align-items:stretch;">
+          <img src="Cronicas_CAPA.jpg" alt="Capa Crônicas de um Campeão" style="width:100%;object-fit:cover;display:block;" />
+        </div>
+        <!-- Contracapa -->
+        <div style="padding:20px 24px;display:flex;flex-direction:column;justify-content:center;gap:14px;">
+          <div style="font-size:15px;font-weight:600;color:var(--gold);font-family:'Cormorant Garamond',serif;line-height:1.4;">O que permanece quando eu não estou?</div>
+          <div style="font-size:12px;color:var(--cream);line-height:1.7;">Essa pergunta é sobre quem você realmente se tornou.</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.7;"><em>Crônicas de um Campeão</em> não é a história de quem chegou ao topo. É a história de quem descobriu, no meio da descida, o que realmente estava carregando.</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.7;">Treze anos como sócio minoritário ensinaram a André Fernandes o que nenhuma escola de negócios ensina: que o maior campo de batalha não é o mercado — é a mente que interpreta o mercado.</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.7;">Esta obra narra a jornada de quem enfrentou o incômodo, o confronto, a queda e, no silêncio que restou, encontrou a consciência que antecede qualquer decisão verdadeira.</div>
+          <div style="border-top:1px solid var(--border);padding-top:12px;">
+            <div style="font-size:13px;font-weight:600;color:var(--gold);font-family:'Cormorant Garamond',serif;line-height:1.6;">Nem tudo que vence é visto.<br>Nem tudo que custa aparece.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+        <!-- Livro 2 — A Vida Sem Rascunho -->
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:12px;">
+      <div style="padding:12px 18px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;">
+        <div style="width:20px;height:20px;border-radius:50%;background:rgba(212,184,122,.15);border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--gold);flex-shrink:0;">2</div>
+        <div>
+          <div style="font-size:13px;font-weight:500;color:var(--cream);">A Vida Sem Rascunho</div>
+          <div style="font-size:10px;color:var(--gold);letter-spacing:.06em;">O MÉTODO AVR-S · Segundo livro da Trilogia</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:200px 1fr;gap:0;">
+        <!-- Capa -->
+        <div style="border-right:1px solid var(--border);display:flex;align-items:stretch;">
+          <img src="AVida_CAPA.jpg" alt="Capa A Vida Sem Rascunho" style="width:100%;object-fit:cover;display:block;" />
+        </div>
+        <!-- Contracapa -->
+        <div style="padding:20px 24px;display:flex;flex-direction:column;justify-content:center;gap:14px;">
+          <div style="font-size:15px;font-weight:600;color:var(--gold);font-family:'Cormorant Garamond',serif;">O Método de Desbloqueio &amp; Direcionamento</div>
+          <div style="font-size:12.5px;color:var(--text2);line-height:1.7;">O livro que dá nome e forma ao método. Apresenta o protocolo AVR-S — Regular, Atenção, Visão, Resposta, Sistema — como o caminho para transformar reação automática em decisão consciente, nas relações, no trabalho e na vida.</div>
+          <div style="border-top:1px solid var(--border);padding-top:12px;">
+            <div style="font-size:13px;font-weight:600;color:var(--gold);font-family:'Cormorant Garamond',serif;line-height:1.6;">Você não reage ao mundo.<br>Reage à versão que constrói dele.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Livro 2 — A Mente é a Causa -->
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:12px;">
+      <div style="padding:12px 18px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;">
+        <div style="width:20px;height:20px;border-radius:50%;background:rgba(212,184,122,.15);border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--gold);flex-shrink:0;">3</div>
+        <div>
+          <div style="font-size:13px;font-weight:500;color:var(--cream);">A Mente é a Causa. A Vida é o Efeito.</div>
+          <div style="font-size:10px;color:var(--gold);letter-spacing:.06em;">A RECONSTRUÇÃO DA ORIGEM · Terceiro livro da Trilogia</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:200px 1fr;gap:0;">
+        <!-- Capa -->
+        <div style="border-right:1px solid var(--border);display:flex;align-items:stretch;">
+          <img src="AMente_CAPA.jpg" alt="Capa A Mente é a Causa" style="width:100%;object-fit:cover;display:block;" />
+        </div>
+        <!-- Contracapa -->
+        <div style="padding:20px 24px;display:flex;flex-direction:column;justify-content:center;gap:14px;">
+          <div style="font-size:15px;font-weight:600;color:var(--gold);font-family:'Cormorant Garamond',serif;line-height:1.4;">De onde nasce a vida que você está construindo?</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.7;">A mente é o solo. As escolhas são as sementes. Os hábitos são o cultivo. A vida é a colheita.</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.7;">Antes de mudar o caminho, é preciso reconstruir aquilo que cria a vida. Este livro mergulha na origem invisível de tudo que se manifesta — crenças, pensamentos, escolhas, comportamentos e resultados.</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.7;">Com o Método AVR–S como guia, André Fernandes conduz o leitor por cinco movimentos que reconstroem a causa para transformar a colheita.</div>
+          <div style="border-top:1px solid var(--border);padding-top:12px;display:flex;gap:16px;flex-wrap:wrap;">
+            <span style="font-size:10px;color:var(--text3);">20 Capítulos</span>
+            <span style="font-size:10px;color:var(--text3);">·</span>
+            <span style="font-size:10px;color:var(--text3);">5 Movimentos</span>
+            <span style="font-size:10px;color:var(--text3);">·</span>
+            <span style="font-size:10px;color:var(--text3);">Uma Origem</span>
+            <span style="font-size:10px;color:var(--text3);">·</span>
+            <span style="font-size:10px;color:var(--text3);">Uma Nova Vida</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- TRILOGIA DA TRANSFORMAÇÃO -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-books"></i> Trilogia da Transformação · Mapa Diagramado</div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;">
+      <div style="padding:14px 18px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <div>
+          <div style="font-size:14px;font-weight:500;color:var(--cream);">Mapa Diagramado da Trilogia da Transformação</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px;">André Fernandes · 3 livros · 1 jornada · 1 propósito · Transformação contínua</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:10px;padding:3px 10px;border-radius:20px;background:rgba(212,184,122,.1);color:var(--gold);border:1px solid var(--border2);">📖 Crônicas de um Campeão</span>
+          <span style="font-size:10px;padding:3px 10px;border-radius:20px;background:rgba(212,184,122,.1);color:var(--gold);border:1px solid var(--border2);">🧠 A Mente é a Causa</span>
+          <span style="font-size:10px;padding:3px 10px;border-radius:20px;background:rgba(212,184,122,.1);color:var(--gold);border:1px solid var(--border2);">⚙️ A Vida Sem Rascunho</span>
+        </div>
+      </div>
+      <div style="padding:16px 18px;">
+        <!-- Três livros -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;">
+          <!-- Livro 1 -->
+          <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <div style="width:24px;height:24px;border-radius:50%;background:rgba(212,184,122,.15);border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--gold);flex-shrink:0;">1</div>
+              <div>
+                <div style="font-size:12px;font-weight:500;color:var(--cream);">Crônicas de um Campeão</div>
+                <div style="font-size:10px;color:var(--gold);letter-spacing:.06em;">O DESPERTAR DO SER</div>
+              </div>
+            </div>
+            <div style="font-size:10px;color:var(--text3);font-style:italic;margin-bottom:8px;">"Quem você se torna durante a caminhada?"</div>
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <div style="font-size:10px;color:var(--text2);display:flex;align-items:center;gap:5px;"><span style="color:var(--gold);">→</span> Incômodo</div>
+              <div style="font-size:10px;color:var(--text2);display:flex;align-items:center;gap:5px;"><span style="color:var(--gold);">→</span> Confronto</div>
+              <div style="font-size:10px;color:var(--text2);display:flex;align-items:center;gap:5px;"><span style="color:var(--gold);">→</span> Queda / Aprendizado</div>
+              <div style="font-size:10px;color:var(--text2);display:flex;align-items:center;gap:5px;"><span style="color:var(--gold);">→</span> Consciência</div>
+              <div style="font-size:10px;color:var(--text2);display:flex;align-items:center;gap:5px;"><span style="color:var(--gold);">→</span> Decisão</div>
+            </div>
+            <div style="margin-top:8px;font-size:10px;padding:3px 8px;background:rgba(212,184,122,.08);border:1px solid var(--border);border-radius:4px;color:var(--text3);text-align:center;">Ponto de Partida</div>
+          </div>
+          <!-- Livro 2 -->
+          <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <div style="width:24px;height:24px;border-radius:50%;background:rgba(212,184,122,.15);border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--gold);flex-shrink:0;">2</div>
+              <div>
+                <div style="font-size:12px;font-weight:500;color:var(--cream);">A Mente é a Causa</div>
+                <div style="font-size:10px;color:var(--gold);letter-spacing:.06em;">A RECONSTRUÇÃO DA ORIGEM</div>
+              </div>
+            </div>
+            <div style="font-size:10px;color:var(--text3);font-style:italic;margin-bottom:8px;">"De onde nasce a vida que você está construindo?"</div>
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <div style="font-size:10px;color:var(--text2);display:flex;align-items:center;gap:5px;"><span style="color:var(--gold);">→</span> Crenças</div>
+              <div style="font-size:10px;color:var(--text2);display:flex;align-items:center;gap:5px;"><span style="color:var(--gold);">→</span> Pensamentos</div>
+              <div style="font-size:10px;color:var(--text2);display:flex;align-items:center;gap:5px;"><span style="color:var(--gold);">→</span> Escolhas</div>
+              <div style="font-size:10px;color:var(--text2);display:flex;align-items:center;gap:5px;"><span style="color:var(--gold);">→</span> Comportamentos</div>
+              <div style="font-size:10px;color:var(--text2);display:flex;align-items:center;gap:5px;"><span style="color:var(--gold);">→</span> Resultados</div>
+            </div>
+            <div style="margin-top:8px;font-size:10px;padding:3px 8px;background:rgba(212,184,122,.08);border:1px solid var(--border);border-radius:4px;color:var(--text3);text-align:center;">Reconstrução da Causa</div>
+          </div>
+          <!-- Livro 3 -->
+          <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <div style="width:24px;height:24px;border-radius:50%;background:rgba(212,184,122,.15);border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--gold);flex-shrink:0;">3</div>
+              <div>
+                <div style="font-size:12px;font-weight:500;color:var(--cream);">A Vida Sem Rascunho</div>
+                <div style="font-size:10px;color:var(--gold);letter-spacing:.06em;">A CONDUÇÃO CONSCIENTE</div>
+              </div>
+            </div>
+            <div style="font-size:10px;color:var(--text3);font-style:italic;margin-bottom:8px;">"Como você reconstrói conscientemente essa caminhada?"</div>
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <div style="font-size:10px;color:var(--text2);display:flex;align-items:center;gap:5px;"><span style="color:var(--gold);">→</span> Atenção</div>
+              <div style="font-size:10px;color:var(--text2);display:flex;align-items:center;gap:5px;"><span style="color:var(--gold);">→</span> Visão</div>
+              <div style="font-size:10px;color:var(--text2);display:flex;align-items:center;gap:5px;"><span style="color:var(--gold);">→</span> Resposta</div>
+              <div style="font-size:10px;color:var(--text2);display:flex;align-items:center;gap:5px;"><span style="color:var(--gold);">→</span> Sistema</div>
+            </div>
+            <div style="margin-top:8px;font-size:10px;padding:3px 8px;background:rgba(212,184,122,.08);border:1px solid var(--border);border-radius:4px;color:var(--text3);text-align:center;">Sustentação pelo Método</div>
+          </div>
+        </div>
+        <!-- Resultado -->
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px;margin-bottom:12px;">
+          <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;text-align:center;">O Resultado de uma Transformação Completa</div>
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;text-align:center;">
+            <div><div style="font-size:11px;font-weight:500;color:var(--gold);">Clareza</div><div style="font-size:10px;color:var(--text3);margin-top:3px;">Decisões alinhadas com quem você realmente é</div></div>
+            <div><div style="font-size:11px;font-weight:500;color:var(--gold);">Consciência</div><div style="font-size:10px;color:var(--text3);margin-top:3px;">Escolhas conscientes gerando vida com propósito</div></div>
+            <div><div style="font-size:11px;font-weight:500;color:var(--gold);">Direção</div><div style="font-size:10px;color:var(--text3);margin-top:3px;">Caminho definido com consistência e intenção</div></div>
+            <div><div style="font-size:11px;font-weight:500;color:var(--gold);">Liderança</div><div style="font-size:10px;color:var(--text3);margin-top:3px;">Influência que transforma ambientes</div></div>
+            <div><div style="font-size:11px;font-weight:500;color:var(--gold);">Legado</div><div style="font-size:10px;color:var(--text3);margin-top:3px;">Impacto que permanece além do tempo</div></div>
+          </div>
+        </div>
+        <!-- Mensagem final -->
+        <div style="background:rgba(212,184,122,.06);border:1px solid var(--border2);border-radius:var(--r2);padding:14px 18px;text-align:center;">
+          <div style="font-size:13px;font-weight:500;color:var(--gold);line-height:1.6;">Primeiro você desperta. Depois reconstrói a causa. Por fim cria um sistema para sustentar uma nova vida.</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:6px;">O ser desperta. A mente é reconstruída. O sistema sustenta. A vida externa é apenas o reflexo da construção interna.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MATERIAIS DO PROJETO -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-folders"></i> Materiais do projeto</div>
+    <div class="mat-grid">
+
+      <div class="mat-card">
+        <div class="mat-header">
+          <div class="mat-icon-wrap"><i class="ti ti-presentation"></i></div>
+          <div class="mat-meta">
+            <div class="mat-nome">Palestra · PPTX v8</div>
+            <div class="mat-sub">A Vida Sem Rascunho</div>
+          </div>
+          <span class="mat-badge mat-badge-pptx">PPTX</span>
+        </div>
+        <div class="mat-desc">Slides completos da palestra institucional com capa banner, ciclo AVR–S e método central. Versão v8 com identidade visual premium.</div>
+        <div class="mat-footer">
+          <span class="mat-tag"><i class="ti ti-file-text"></i> 50+ slides</span>
+          <a class="mat-btn" href="AVRS_Palestra_Maconaria_RJ_v8.pptx" download><i class="ti ti-download"></i> Baixar</a>
+        </div>
+      </div>
+
+
+      <div class="mat-card">
+        <div class="mat-header">
+          <div class="mat-icon-wrap"><i class="ti ti-chart-bar"></i></div>
+          <div class="mat-meta">
+            <div class="mat-nome">Comparativo de Métodos</div>
+            <div class="mat-sub">AVR–S vs Lideranças</div>
+          </div>
+          <span class="mat-badge mat-badge-pptx">PPTX</span>
+        </div>
+        <div class="mat-desc">Análise comparativa posicionando o AVR–S frente a cinco metodologias de liderança: Situacional, Inteligência Emocional, Servidora, Growth Mindset e OKRs.</div>
+        <div class="mat-footer">
+          <span class="mat-tag"><i class="ti ti-arrows-diff"></i> 5 metodologias</span>
+          <a class="mat-btn" href="AVRS_Comparativo_Metodos_Lideranca.pptx" download><i class="ti ti-download"></i> Baixar</a>
+        </div>
+      </div>
+
+      <div class="mat-card">
+        <div class="mat-header">
+          <div class="mat-icon-wrap"><i class="ti ti-notebook"></i></div>
+          <div class="mat-meta">
+            <div class="mat-nome">Guia do Facilitador</div>
+            <div class="mat-sub">Workshop AVR–S Liderança</div>
+          </div>
+          <span class="mat-badge mat-badge-docx">DOCX</span>
+        </div>
+        <div class="mat-desc">Manual completo para condução do workshop: roteiro detalhado, timing por bloco, orientações de facilitação e gestão de dinâmicas em grupo.</div>
+        <div class="mat-footer">
+          <span class="mat-tag"><i class="ti ti-clock"></i> 8h de conteúdo</span>
+          <a class="mat-btn" href="AVRS_Guia_Facilitacao_Aprofundado.docx" download><i class="ti ti-download"></i> Baixar</a>
+        </div>
+      </div>
+
+      <div class="mat-card">
+        <div class="mat-header">
+          <div class="mat-icon-wrap"><i class="ti ti-user-check"></i></div>
+          <div class="mat-meta">
+            <div class="mat-nome">Roteiro do Líder</div>
+            <div class="mat-sub">Kit Líderes Replicadores</div>
+          </div>
+          <span class="mat-badge mat-badge-docx">DOCX</span>
+        </div>
+        <div class="mat-desc">Guia de aplicação para líderes replicadores: como facilitar dinâmicas AVR–S com a equipe, roteiros de conversa e marcos de acompanhamento.</div>
+        <div class="mat-footer">
+          <span class="mat-tag"><i class="ti ti-users"></i> Replicadores</span>
+          <a class="mat-btn" href="AVRS_Kit_Roteiro_Lider.docx" download><i class="ti ti-download"></i> Baixar</a>
+        </div>
+      </div>
+
+      <div class="mat-card">
+        <div class="mat-header">
+          <div class="mat-icon-wrap"><i class="ti ti-pencil"></i></div>
+          <div class="mat-meta">
+            <div class="mat-nome">Workbook Aprofundado</div>
+            <div class="mat-sub">Material do Participante</div>
+          </div>
+          <span class="mat-badge mat-badge-docx">DOCX</span>
+        </div>
+        <div class="mat-desc">Caderno de exercícios completo do participante: diagnósticos, mapas de percepção, reflexões guiadas e espaços de comprometimento pessoal.</div>
+        <div class="mat-footer">
+          <span class="mat-tag"><i class="ti ti-writing"></i> Participante</span>
+          <a class="mat-btn" href="AVRS_Workbook_Aprofundado.docx" download><i class="ti ti-download"></i> Baixar</a>
+        </div>
+      </div>
+
+      <div class="mat-card">
+        <div class="mat-header">
+          <div class="mat-icon-wrap"><i class="ti ti-list-details"></i></div>
+          <div class="mat-meta">
+            <div class="mat-nome">Roteiro do Workshop</div>
+            <div class="mat-sub">Liderança Consciente</div>
+          </div>
+          <span class="mat-badge mat-badge-docx">DOCX</span>
+        </div>
+        <div class="mat-desc">Roteiro aprofundado do workshop AVR–S: estrutura modular de 8 horas, scripts de facilitação, transições e instruções de cada dinâmica.</div>
+        <div class="mat-footer">
+          <span class="mat-tag"><i class="ti ti-layers"></i> 8 módulos</span>
+          <a class="mat-btn" href="AVRS_Workshop_Roteiro_Aprofundado.docx" download><i class="ti ti-download"></i> Baixar</a>
+        </div>
+      </div>
+
+      <div class="mat-card">
+        <div class="mat-header">
+          <div class="mat-icon-wrap"><i class="ti ti-forms"></i></div>
+          <div class="mat-meta">
+            <div class="mat-nome">Folha de Exercícios</div>
+            <div class="mat-sub">Sessão de Equipe</div>
+          </div>
+          <span class="mat-badge mat-badge-docx">DOCX</span>
+        </div>
+        <div class="mat-desc">Material imprimível para dinâmicas em equipe: automáticos, regras invisíveis, acordos conscientes e checklist AVR–S para uso em sessão.</div>
+        <div class="mat-footer">
+          <span class="mat-tag"><i class="ti ti-printer"></i> Imprimível</span>
+          <a class="mat-btn" href="AVRS_Kit_Folha_Equipe.docx" download><i class="ti ti-download"></i> Baixar</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TRÍADE -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-layout-grid"></i> Tríade de implementação</div>
+    <div class="pilares" id="pilares"></div>
+  </div>
+
+  <!-- INPI -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-shield"></i> Proteção intelectual · uso interno</div>
+    <div class="inpi-card">
+      <i class="ti ti-shield-lock lock"></i>
+      <div class="inpi-info">
+        <div class="inpi-top"><div class="inpi-nome">Registro INPI — Marca AVR–S</div><span class="inpi-badge">🔒 Confidencial</span></div>
+        <div class="inpi-sub">Classes 41 (educação) e 42 (software) · Custo estimado R$710 · inpi.gov.br</div>
+        <div class="inpi-items" id="inpiItems"></div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===== PROJETOS (Firebase · privado) ===== -->
+  <style>
+    .prj-wrap{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;}
+    .prj-login{max-width:340px;margin:6px auto;display:flex;flex-direction:column;gap:10px;}
+    .prj-login input{width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r2);padding:11px 13px;color:var(--cream);font-family:'DM Sans',sans-serif;font-size:14px;}
+    .prj-login input:focus{outline:none;border-color:rgba(212,184,122,.5);}
+    .prj-btn{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#20180a;border:none;border-radius:var(--r2);padding:11px 16px;font-weight:600;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;}
+    .prj-btn.ghost{background:transparent;color:var(--gold);border:1px solid var(--border2);}
+    .prj-btn.danger{background:transparent;color:#d47a7a;border:1px solid rgba(212,122,122,.3);}
+    .prj-err{color:#d47a7a;font-size:12px;text-align:center;min-height:16px;}
+    .prj-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px;}
+    .prj-bar .who{font-size:11px;color:var(--text3);margin-right:auto;}
+    .prj-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:16px;}
+    .prj-kpi{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:10px 12px;}
+    .prj-kpi .n{font-size:20px;font-weight:600;color:var(--gold);font-family:'Cormorant Garamond',serif;}
+    .prj-kpi .l{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-top:2px;}
+    .prj-pilar-h{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin:16px 0 8px;display:flex;justify-content:space-between;}
+    .prj-row{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:11px 13px;margin-bottom:7px;cursor:pointer;transition:all .15s;}
+    .prj-row:hover{border-color:var(--border2);transform:translateY(-1px);}
+    .prj-row .top{display:flex;justify-content:space-between;align-items:center;gap:10px;}
+    .prj-row .nome{font-size:13px;color:var(--cream);font-weight:500;}
+    .prj-badge{font-size:10px;padding:2px 9px;border-radius:20px;white-space:nowrap;border:1px solid;}
+    .prj-track{height:5px;background:rgba(255,255,255,.06);border-radius:4px;margin-top:8px;overflow:hidden;}
+    .prj-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:4px;}
+    .prj-meta{font-size:11px;color:var(--text3);margin-top:6px;}
+    .prj-modal{position:fixed;inset:0;background:rgba(6,5,4,.82);backdrop-filter:blur(4px);z-index:9000;display:none;align-items:center;justify-content:center;padding:16px;}
+    .prj-modal.on{display:flex;}
+    .prj-card{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);width:100%;max-width:460px;max-height:90vh;overflow:auto;padding:20px;}
+    .prj-card h3{font-family:'Cormorant Garamond',serif;color:var(--gold);font-size:20px;margin:0 0 14px;}
+    .prj-field{margin-bottom:12px;}
+    .prj-field label{display:block;font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;}
+    .prj-field input,.prj-field select,.prj-field textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:9px 11px;color:var(--cream);font-family:'DM Sans',sans-serif;font-size:13px;}
+    .prj-field textarea{min-height:64px;resize:vertical;}
+    .prj-range-val{color:var(--gold);font-weight:600;}
+    .prj-actions{display:flex;gap:8px;margin-top:16px;}
+    .prj-actions .prj-btn{flex:1;}
+  </style>
+  <div class="section">
+    <div class="section-title"><i class="ti ti-layout-kanban"></i> Status dos Projetos · privado</div>
+    <div class="prj-wrap">
+      <!-- painel -->
+      <div id="prj-panel" style="display:none;">
+        <div class="prj-bar">
+          <span class="who" id="prj-who"></span>
+          <button class="prj-btn ghost" id="prj-add">+ Projeto</button>
+          <button class="prj-btn ghost" id="prj-seed">Atualizar lista</button>
+          <button class="prj-btn danger" id="prj-signout">Sair</button>
+        </div>
+        <div class="prj-err" id="prj-err"></div>
+        <div class="prj-kpis" id="prj-kpis"></div>
+        <div id="prj-list"></div>
+      </div>
+    </div>
+  </div>
+
+<!-- EVOLUÇÃO DO APP AVR-S (coleção evolucao_app) -->
+<div class="section" id="evo-section" style="display:none;">
+  <div class="section-title"><i class="ti ti-chart-line"></i> Evolução do App AVR–S · privado</div>
+  <div id="evo-panel"><p class="evo-load">Carregando a evolução…</p></div>
+</div>
+
+  <!-- modal editor -->
+  <div class="prj-modal" id="prj-modal">
+    <div class="prj-card">
+      <h3 id="prj-modal-title">Editar projeto</h3>
+      <div class="prj-field"><label>Pilar</label><input id="f-pilar" /></div>
+      <div class="prj-field"><label>Projeto</label><input id="f-projeto" /></div>
+      <div class="prj-field"><label>Descrição</label><textarea id="f-descricao"></textarea></div>
+      <div class="prj-field"><label>Status</label>
+        <select id="f-status">
+          <option>Concluído</option><option>Em produção final</option><option>Em desenvolvimento</option>
+          <option>Estruturado</option><option>Planejado</option><option>Em andamento</option>
+          <option>Aguardando decisão</option><option>Pendente / em risco</option>
+        </select>
+      </div>
+      <div class="prj-field"><label>Progresso · <span class="prj-range-val" id="f-pct-val">0%</span></label>
+        <input type="range" id="f-pct" min="0" max="100" step="5" />
+      </div>
+      <div class="prj-field"><label>Prioridade</label>
+        <select id="f-prioridade"><option>Alta</option><option>Média</option><option>Baixa</option></select>
+      </div>
+      <div class="prj-field"><label>Próximo passo</label><textarea id="f-proximo"></textarea></div>
+      <div class="prj-field"><label>Referência</label><input id="f-ref" /></div>
+      <div class="prj-actions">
+        <button class="prj-btn" id="prj-save">Salvar</button>
+        <button class="prj-btn ghost" id="prj-cancel">Cancelar</button>
+        <button class="prj-btn danger" id="prj-del">Excluir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEQUÊNCIA -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-route"></i> Sequência de ativação</div>
+    <div class="seq" id="seq"></div>
+  </div>
+
+  <!-- LEGENDA -->
+  <div class="section" style="margin-bottom:16px">
+    <div class="legenda">
+      <div class="leg-item"><div class="leg-dot" style="background:var(--gold)"></div><span class="leg-txt">Concluído</span></div>
+      <div class="leg-item"><div class="leg-dot" style="background:#EF9F27"></div><span class="leg-txt">Em andamento</span></div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--text3)"></div><span class="leg-txt">Pendente</span></div>
+      <span style="font-size:11px;color:var(--text3);margin-left:4px">· toque nos itens para alterar</span>
+    </div>
+  </div>
+
+  <!-- CHECKLIST LANÇAMENTO -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-rocket"></i> Checklist de lançamento · Setembro 2026</div>
+    <div id="launchChecklist"></div>
+  </div>
+
+  <!-- NOTAS -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-notes"></i> Anotações do projeto</div>
+    <div class="notas-area">
+      <div class="notas-header"><i class="ti ti-edit" style="font-size:15px;color:var(--text3)"></i><span>Registro de decisões e próximos passos</span></div>
+      <div class="notas-list" id="notasList"></div>
+      <div class="notas-input-row">
+        <input class="notas-input" id="notaInput" placeholder="Nova anotação..." onkeydown="if(event.key==='Enter')addNota()"/>
+        <button class="notas-btn" onclick="addNota()"><i class="ti ti-plus"></i> Adicionar</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="footer">
+  AVR–S · A Vida Sem Rascunho · Audax Consultoria<br>
+  CNPJ 33.344.650/0001-03 · audax.silfexsil@gmail.com · (21) 96416-4234<br>
+  © 2025 Todos os direitos reservados · Documento interno
+</footer>
+
+<script>
+const CICLOS=['done','prog','pend'];
+const LABELS={done:'Concluído',prog:'Em andamento',pend:'Pendente'};
+const PILARES=[
+  {id:'trilogia',nome:'Trilogia',sub:'Trilogia da Transformação',icon:'ti-books',items:[
+    {id:'t1',label:'A Mente É a Causa — completo',status:'done'},
+    {id:'t2',label:'A Vida Sem Rascunho — completo',status:'done'},
+    {id:'t3',label:'Crônicas de um Campeão — completo',status:'done'},
+    {id:'t4',label:'Diagramação com Ivan (InDesign)',status:'prog'},
+    {id:'t5',label:'Envio à gráfica',status:'pend'},
+    {id:'t6',label:'Lançamento — 17/09/2026',status:'pend'},
+  ]},
+  {id:'app',nome:'App',sub:'AVR–S Digital + Finance',icon:'ti-device-mobile',items:[
+    {id:'a1',label:'Firebase + login (sync cross-device)',status:'done'},
+    {id:'a2',label:'Mentor IA com voz',status:'done'},
+    {id:'a3',label:'Overhaul segurança isPro (Worker)',status:'done'},
+    {id:'a4',label:'Bug Fechamento do Dia — resolvido',status:'done'},
+    {id:'a5',label:'Pix Pro — token PagBank atualizado',status:'done'},
+    {id:'a6',label:'AVR-S Finance — versão local no ar',status:'prog'},
+    {id:'a7',label:'AVR-S Finance — Fase 1 conectada',status:'pend'},
+  ]},
+  {id:'palestra',nome:'Palestra',sub:'Geral + Liderança + Workshop',icon:'ti-presentation',items:[
+    {id:'p1',label:'Slides palestra geral',status:'done'},
+    {id:'p2',label:'Slides liderança / militar',status:'done'},
+    {id:'p3',label:'Workshop aprofundado (kit completo)',status:'done'},
+    {id:'p4',label:'Ensaio / dry run',status:'pend'},
+    {id:'p5',label:'Primeira apresentação',status:'pend'},
+  ]},
+  {id:'ccr',nome:'CCR',sub:'O Campo de Consciência Relacional',icon:'ti-circles-relation',items:[
+    {id:'c1',label:'Documento Mestre v2.2 (~29 mil palavras)',status:'done'},
+    {id:'c2',label:'15 diagramas (SVG→PNG)',status:'done'},
+    {id:'c3',label:'Leitura a lápis do André',status:'pend'},
+    {id:'c4',label:'Briefing para o Ivan',status:'pend'},
+    {id:'c5',label:'Lançamento — 2ª onda (out/2026)',status:'pend'},
+  ]},
+  {id:'cursos',nome:'Cursos',sub:'Formação presencial + Jornada gravada',icon:'ti-route',items:[
+    {id:'cu1',label:'Formação AVR-S presencial — estruturada',status:'done'},
+    {id:'cu2',label:'Reduzir de 10 para 6-8 encontros',status:'prog'},
+    {id:'cu3',label:'Instrumentos de escuta / inscrição',status:'done'},
+    {id:'cu4',label:'Jornada da Transformação (gravado)',status:'pend'},
+  ]},
+  {id:'tca',nome:'TCA & Fundação',sub:'Teoria + governança institucional',icon:'ti-shield',items:[
+    {id:'tc1',label:'Manuscrito Edição Fundacional v3',status:'done'},
+    {id:'tc2',label:'Governança certificação (TCA-013)',status:'done'},
+    {id:'tc3',label:'Registro público no site',status:'pend'},
+    {id:'tc4',label:'Bandeira e selo da Fundação',status:'pend'},
+  ]}
+];
+const INPI_ITEMS=[
+  {id:'i1',label:'Busca prévia no e-INPI',status:'done'},
+  {id:'i2',label:'Pedido Classe 41 — Educação',status:'done'},
+  {id:'i3',label:'Pagamento GRU',status:'done'},
+  {id:'i4',label:'Protocolo — processo 944047670',status:'done'},
+  {id:'i5',label:'Acompanhar exame de mérito',status:'prog'},
+];
+const SEQ=[{label:'Trilogia'},{label:'App'},{label:'Palestra'},{label:'CCR'},{label:'Cursos'},{label:'INPI 🔒'},{label:'Escala'}];
+
+let estado=JSON.parse(localStorage.getItem('avrs_status')||'{}');
+const LAUNCH_GROUPS=[
+  {id:'lc_content',nome:'Conteúdo & App',icon:'ti-device-mobile',items:[
+    {id:'lc1',label:'Manual do app — revisar e atualizar conteúdo',status:'pend'},
+    {id:'lc2',label:'Testar Jornada completa com dados reais (módulos 1-4)',status:'pend'},
+    {id:'lc3',label:'Testar Galeria com imagens carregando',status:'pend'},
+    {id:'lc4',label:'Verificar Score Final do diagnóstico completo',status:'pend'},
+    {id:'lc5',label:'Validar dias 6-20 da Jornada (Pro) com dados reais',status:'pend'},
+  ]},
+  {id:'lc_tech',nome:'Técnico',icon:'ti-settings',items:[
+    {id:'lc7',label:'Testar fluxo de assinatura Pro via PagBank ponta a ponta',status:'pend'},
+    {id:'lc8',label:'Testar Firebase Auth em dispositivos reais (iOS e Android)',status:'pend'},
+  ]},
+  {id:'lc_mkt',nome:'Marketing & Ecossistema',icon:'ti-speakerphone',items:[
+    {id:'lc9',label:'Landing page avrs.com.br — atualizar CTA para app.avrs.com.br',status:'pend'},
+    {id:'lc10',label:'Definir data exata de lançamento',status:'pend'},
+    {id:'lc11',label:'Definir canais de divulgação',status:'pend'},
+    {id:'lc12',label:'Definir preço Pro',status:'pend'},
+  ]},
+  {id:'lc_cockpit',nome:'Cockpit',icon:'ti-layout-dashboard',items:[
+    {id:'lc13',label:'Checklist de lançamento adicionado ao cockpit',status:'done'},
+  ]},
+];
+LAUNCH_GROUPS.forEach(g=>g.items.forEach(it=>{if(!estado[it.id])estado[it.id]=it.status;}));
+
+function renderLaunch(){
+  document.getElementById('launchChecklist').innerHTML=LAUNCH_GROUPS.map(g=>{
+    const conc=g.items.filter(it=>(estado[it.id]||'pend')==='done').length;
+    return`<div class="launch-group">
+      <div class="launch-group-title"><i class="ti ${g.icon}"></i>${g.nome}<span class="launch-progress">${conc}/${g.items.length}</span></div>
+      ${g.items.map(it=>{const s=estado[it.id]||'pend';return`<div class="item s-${s}" onclick="toggle('${it.id}')"><div class="item-dot"></div><span class="item-label">${it.label}</span><span class="item-badge">${LABELS[s]}</span></div>`;}).join('')}
+    </div>`;
+  }).join('');
+}
+
+let notas=JSON.parse(localStorage.getItem('avrs_notas')||'[]');
+PILARES.forEach(p=>p.items.forEach(it=>{if(!estado[it.id])estado[it.id]=it.status;}));
+INPI_ITEMS.forEach(it=>{if(!estado[it.id])estado[it.id]=it.status;});
+function salvar(){localStorage.setItem('avrs_status',JSON.stringify(estado));}
+function toggle(id){const atual=estado[id]||'pend';estado[id]=CICLOS[(CICLOS.indexOf(atual)+1)%CICLOS.length];salvar();render();renderLaunch();}
+function render(){
+  document.getElementById('pilares').innerHTML=PILARES.map(p=>`<div class="pilar"><div class="pilar-header"><i class="ti ${p.icon}" style="color:var(--gold)"></i><div><div class="pilar-nome">${p.nome}</div><div class="pilar-sub">${p.sub}</div></div></div><div class="pilar-items">${p.items.map(it=>{const s=estado[it.id]||'pend';return`<div class="item s-${s}" onclick="toggle('${it.id}')"><div class="item-dot"></div><span class="item-label">${it.label}</span><span class="item-badge">${LABELS[s]}</span></div>`;}).join('')}</div></div>`).join('');
+  document.getElementById('inpiItems').innerHTML=INPI_ITEMS.map(it=>{const s=estado[it.id]||'pend';return`<div class="item s-${s}" onclick="toggle('${it.id}')"><div class="item-dot"></div><span class="item-label">${it.label}</span><span class="item-badge">${LABELS[s]}</span></div>`;}).join('');
+  const todos=[...PILARES.flatMap(p=>p.items),...INPI_ITEMS];
+  const conc=todos.filter(it=>(estado[it.id]||it.status)==='done').length;
+  const pct=Math.round(conc/todos.length*100);
+  document.getElementById('progressPill').textContent=pct+'% concluído';
+  document.getElementById('seq').innerHTML=SEQ.map((s,i)=>`<div class="seq-step"><div class="seq-circle ${pct>i*20?'done':''}">${i+1}</div><span class="seq-label">${s.label}</span></div>${i<SEQ.length-1?'<div class="seq-arrow"></div>':''}`).join('')+`<span class="seq-pct">${conc}/${todos.length}</span>`;
+}
+function addNota(){const input=document.getElementById('notaInput');const texto=input.value.trim();if(!texto)return;const agora=new Date();const data=agora.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'})+' '+agora.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});notas.unshift({id:Date.now(),texto,data});localStorage.setItem('avrs_notas',JSON.stringify(notas));input.value='';renderNotas();}
+function delNota(id){notas=notas.filter(n=>n.id!==id);localStorage.setItem('avrs_notas',JSON.stringify(notas));renderNotas();}
+function renderNotas(){const el=document.getElementById('notasList');if(!notas.length){el.innerHTML='<div class="notas-vazia">Nenhuma anotação ainda.</div>';return;}el.innerHTML=notas.map(n=>`<div class="nota-item"><span class="nota-data">${n.data}</span><span class="nota-texto">${n.texto}</span><button class="nota-del" onclick="delNota(${n.id})"><i class="ti ti-x"></i></button></div>`).join('');}
+function renderDate(){const d=new Date();document.getElementById('headerDate').textContent=d.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});}
+render();renderLaunch();renderNotas();renderDate();
+</script>
+
+</div><!-- end cockpit-content -->
+
+
+
+<script id="evo-render">
+
+window.renderEvolucao=function(S,root,salvar){
+var COMP=S.dims.filter(function(d){return d.c}).map(function(d){return d.k});
+var ALL=S.dims.map(function(d){return d.k});
+function avg(a){var v=a.filter(function(x){return typeof x==='number'});return v.length?v.reduce(function(s,x){return s+x},0)/v.length:null}
+function comp(v){return avg(COMP.map(function(k){return v[k]}))}
+function geral(v){return avg(ALL.map(function(k){return v[k]}))}
+function f1(x){return x==null?'—':x.toFixed(1).replace('.',',')}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function dataBR(iso){var p=iso.split('-');return p[2]+'/'+p[1]+'/'+p[0]}
+function dataCurta(iso){var p=iso.split('-');return p[2]+'/'+p[1]+'/'+p[0].slice(2)}
+var AV=S.av.slice().sort(function(a,b){return a.d<b.d?-1:a.d>b.d?1:0});
+var first=AV[0], last=AV[AV.length-1];
+var ref=S.apps.filter(function(a){return a.n===S.ref})[0];
+var REF=comp(ref.v);
+var cNow=comp(last.v), cStart=comp(first.v);
+var M=S.meta||null, cMeta=M?comp(M.v):null;
+function diasAte(iso){var p=iso.split('-');var alvo=new Date(+p[0],+p[1]-1,+p[2]);var h=new Date();h.setHours(0,0,0,0);return Math.round((alvo-h)/864e5)}
+
+function regua(){
+  var W=480,x0=22,x1=458;function X(v){return x0+(v-1)/9*(x1-x0)}
+  var s='<svg viewBox="0 0 '+W+' '+(AV.length>1&&M?154:132)+'" role="img" aria-label="Régua de 1 a 10: AVR-S em '+f1(cNow)+', referência em '+f1(REF)+'">';
+  s+='<line x1="'+x0+'" y1="78" x2="'+x1+'" y2="78" stroke="var(--line)" stroke-width="2"/>';
+  for(var i=1;i<=10;i++){s+='<line x1="'+X(i)+'" y1="72" x2="'+X(i)+'" y2="84" stroke="var(--text3)" stroke-width="1"/><text class="lbl" x="'+X(i)+'" y="104" text-anchor="middle">'+i+'</text>'}
+  s+='<line x1="'+X(cNow)+'" y1="78" x2="'+X(REF)+'" y2="78" stroke="var(--gold)" stroke-width="2" stroke-dasharray="3 4"/>';
+  s+='<line x1="'+X(REF)+'" y1="50" x2="'+X(REF)+'" y2="92" stroke="var(--text2)" stroke-width="1.5" stroke-dasharray="4 3"/>';
+  s+='<text class="lblb" x="'+X(REF)+'" y="42" text-anchor="middle">'+esc(S.ref)+' '+f1(REF)+'</text>';
+  if(M){s+='<line x1="'+X(cMeta)+'" y1="62" x2="'+X(cMeta)+'" y2="92" stroke="var(--gold2)" stroke-width="2"/><text class="lblb" x="'+X(cMeta)+'" y="124" text-anchor="middle">meta '+dataCurta(M.d).slice(0,5)+' · '+f1(cMeta)+'</text>'}
+  if(AV.length>1){s+='<circle cx="'+X(cStart)+'" cy="78" r="6" fill="var(--bg)" stroke="var(--text3)" stroke-width="2"/><text class="lbl" x="'+X(cStart)+'" y="'+(M?148:124)+'" text-anchor="middle">partida '+f1(cStart)+'</text>'}
+  s+='<circle cx="'+X(cNow)+'" cy="78" r="9" fill="var(--gold)"/>';
+  s+='<text class="num" x="'+X(cNow)+'" y="52" text-anchor="middle">'+f1(cNow)+'</text>';
+  return s+'</svg>';
+}
+
+function linha(){
+  var W=640,H=250,l=34,r=16,t=16,b=40,iw=W-l-r,ih=H-t-b,n=AV.length;
+  function X(i){return n===1?l+iw/2:l+24+i*(iw-48)/(n-1)} function Y(v){return t+ih-(v/10)*ih}
+  var s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Médias do AVR-S por avaliação">';
+  [0,2,4,6,8,10].forEach(function(v){s+='<line x1="'+l+'" x2="'+(W-r)+'" y1="'+Y(v)+'" y2="'+Y(v)+'" stroke="var(--line2)"/><text x="'+(l-8)+'" y="'+(Y(v)+4)+'" text-anchor="end" font-size="15" fill="var(--text3)" font-family="var(--sans)">'+v+'</text>'});
+  s+='<line x1="'+l+'" x2="'+(W-r)+'" y1="'+Y(REF)+'" y2="'+Y(REF)+'" stroke="var(--text3)" stroke-width="1.5" stroke-dasharray="6 5"/>';
+  if(M)s+='<line x1="'+l+'" x2="'+(W-r)+'" y1="'+Y(cMeta)+'" y2="'+Y(cMeta)+'" stroke="var(--gold2)" stroke-width="1.5" stroke-dasharray="2 4"/>';
+  function serie(fn,cor,w){var pts=AV.map(function(a,i){return X(i)+','+Y(fn(a.v))}).join(' ');var o='';if(n>1)o+='<polyline points="'+pts+'" fill="none" stroke="'+cor+'" stroke-width="'+w+'" stroke-linejoin="round"/>';AV.forEach(function(a,i){o+='<circle cx="'+X(i)+'" cy="'+Y(fn(a.v))+'" r="'+(w+2)+'" fill="'+cor+'"><title>'+dataBR(a.d)+': '+f1(fn(a.v))+'</title></circle>'});return o}
+  s+=serie(geral,'var(--text2)',1.5)+serie(comp,'var(--gold)',2.5);
+  AV.forEach(function(a,i){s+='<text x="'+X(i)+'" y="'+(H-14)+'" text-anchor="middle" font-size="15" fill="var(--text3)" font-family="var(--sans)">'+dataCurta(a.d)+'</text>'});
+  return s+'</svg>';
+}
+
+function barras(){
+  var h='<div class="bar-head"><span></span><span class="k">'+(AV.length>1?'<em class="p">'+dataCurta(first.d)+'</em>':'')+'<em>'+dataCurta(last.d)+'</em>'+(M?'<em class="m">meta '+dataCurta(M.d)+'</em>':'')+'</span></div>';
+  S.dims.forEach(function(d){
+    var p=first.v[d.k],u=last.v[d.k],dl=(AV.length>1&&p!=null&&u!=null)?u-p:null;
+    h+='<div class="bar-row"><div class="nm">'+esc(d.n)+(dl?' <span class="delta">'+(dl>0?'+':'')+dl+'</span>':'')+'</div><div class="track">';
+    if(AV.length>1)h+='<div class="b p" title="'+dataBR(first.d)+': '+p+'"><span style="width:'+(p*10)+'%"></span></div>';
+    h+='<div class="b u" title="'+dataBR(last.d)+': '+u+'"><span style="width:'+(u*10)+'%"></span>'+(M&&M.v[d.k]!=null?'<i class="mt" style="left:calc('+(M.v[d.k]*10)+'% - 1px)" title="Meta: '+M.v[d.k]+'"></i>':'')+'</div></div></div>';
+  });
+  return h;
+}
+
+function tint(v){if(v==null)return '';var a=(0.05+((v-1)/9)*0.5).toFixed(2);return 'background:rgba(212,184,122,'+a+')'}
+function matriz(){
+  var cols=[{n:'AVR-S',v:last.v,me:true}].concat(S.apps);
+  var h='<div class="scroll"><table><thead><tr><th scope="col">Dimensão</th>';
+  cols.forEach(function(c,i){h+=c.me?'<th scope="col" class="me">AVR-S</th>'+(M?'<th scope="col" class="mt-h">Meta '+dataCurta(M.d).slice(0,5)+'</th>':''):'<th scope="col"><button type="button" data-app="'+esc(c.n)+'" aria-pressed="false">'+esc(c.n)+'</button></th>'});
+  h+='</tr></thead><tbody>';var g='';var NC=cols.length+(M?2:1);
+  S.dims.forEach(function(d){
+    if(d.g!==g){g=d.g;h+='<tr class="grp"><td colspan="'+NC+'">'+esc(g==='Suas 4'?'As quatro pedidas':g)+'</td></tr>'}
+    h+='<tr><td>'+esc(d.n)+(d.c?'':' <span class="muted">*</span>')+'</td>';
+    cols.forEach(function(c){var v=c.v[d.k];h+='<td class="'+(c.me?'me':'')+'"><span class="cell" style="'+tint(v)+'">'+(v==null?'':v)+'</span></td>';if(c.me&&M)h+='<td class="mt-c">'+M.v[d.k]+'</td>'});
+    h+='</tr>';
+  });
+  h+='<tr><td><b>Média nas 7 comparáveis</b></td>';
+  cols.forEach(function(c){h+='<td class="'+(c.me?'me':'')+'"><b>'+f1(comp(c.v))+'</b></td>';if(c.me&&M)h+='<td class="mt-c"><b>'+f1(cMeta)+'</b></td>'});
+  h+='</tr></tbody></table></div><p class="note">* Fora da média comparável: nem todos os apps têm nota nessa dimensão. Célula vazia = sem base pública. A coluna AVR-S mostra a avaliação mais recente ('+dataBR(last.d)+').</p><div id="evo-base" class="base" hidden></div>';
+  return h;
+}
+
+function form(){
+  var hoje=new Date(),iso=hoje.getFullYear()+'-'+String(hoje.getMonth()+1).padStart(2,'0')+'-'+String(hoje.getDate()).padStart(2,'0');
+  var h='<form id="evo-f" novalidate><div class="row2"><div><label for="evo-fd">Data</label><input type="date" id="evo-fd" value="'+iso+'" required></div><div><label for="evo-fm">Marco</label><input type="text" id="evo-fm" maxlength="80" placeholder="Ex.: preço, CVV e Boas-Vindas publicados" required></div></div><div class="dims">';
+  S.dims.forEach(function(d){
+    h+='<div class="dim"><label for="evo-d_'+d.k+'">'+esc(d.n)+'<small>antes: '+last.v[d.k]+'</small></label><select id="evo-d_'+d.k+'">';
+    for(var i=1;i<=10;i++)h+='<option'+(i===last.v[d.k]?' selected':'')+'>'+i+'</option>';
+    h+='</select></div>';
+  });
+  h+='</div><div class="actions"><button class="btn" type="submit" id="evo-save">Salvar avaliação</button><span id="evo-status" role="status" aria-live="polite"></span></div></form>';
+  h+='<ol class="hist">';
+  AV.slice().reverse().forEach(function(a,i){h+='<li><b>'+dataBR(a.d)+'</b><span>'+esc(a.m)+'</span><span class="v">'+f1(comp(a.v))+'</span></li>'});
+  h+='</ol>';
+  if(AV.length>1)h+='<div class="actions"><button type="button" class="link" id="evo-undo">Remover a avaliação mais recente</button></div>';
+  return h;
+}
+
+var delta=cNow-cStart;
+root.innerHTML=
+ '<div class="evo-main"><header><h1>Evolução do AVR-S</h1><p class="lead">Média nas sete dimensões que todos os apps comparados têm em comum, numa régua de 1 a 10. A linha tracejada é a referência: '+esc(S.ref)+', o mais bem avaliado.'+(M?' A marca clara é a meta para '+dataBR(M.d)+'.':'')+'</p>'
+ +'<div class="regua">'+regua()+'</div>'
+ +'<div class="facts">'+(M?'<div class="fact"><b>'+f1(Math.max(0,cMeta-cNow))+'</b><span>até a meta'+(diasAte(M.d)>=0?', faltam '+diasAte(M.d)+' dias':'')+'</span></div>':'')+'<div class="fact"><b>'+f1(REF-cNow)+'</b><span>até a referência</span></div><div class="fact"><b>'+(AV.length>1?(delta>=0?'+':'')+f1(delta):'—')+'</b><span>desde '+dataBR(first.d)+'</span></div><div class="fact"><b>'+f1(geral(last.v))+'</b><span>média nas 15 dimensões</span></div><div class="fact"><b>'+AV.length+'</b><span>'+(AV.length===1?'avaliação':'avaliações')+'</span></div></div>'
+ +'<nav class="jump" aria-label="Seções"><a href="#evo-evolucao">Evolução</a><a href="#evo-matriz">Matriz</a><a href="#evo-registrar">Registrar avaliação</a><a href="#evo-regua">Régua e limites</a></nav></header>'
+ +'<section id="evo-evolucao"><h2>Evolução</h2><p class="muted">Uma marca por avaliação.</p><div class="chart">'+linha()+'</div><div class="legend"><span><i></i>Média nas 7 comparáveis</span><span><i class="g"></i>Média nas 15 dimensões</span><span><i class="r"></i>'+esc(S.ref)+' ('+f1(REF)+')</span>'+(M?'<span><i class="m"></i>Meta '+dataBR(M.d)+' ('+f1(cMeta)+')</span>':'')+'</div>'+(AV.length===1?'<p class="note">A linha se forma a partir da segunda avaliação.</p>':'')
+ +'<div class="bars">'+barras()+'</div>'+(AV.length===1?'<p class="note">Quando houver uma segunda avaliação, cada dimensão mostra a primeira e a mais recente, com a diferença.</p>':'')+'</section>'
+ +'<section id="evo-matriz"><h2>Matriz</h2><p class="muted">Toque no nome de um app para ver em que se apoia a nota.</p>'+matriz()+'</section>'
+ +'<section id="evo-registrar"><h2>Registrar avaliação</h2><p class="muted">As notas começam iguais às da última avaliação; mude só o que mudou.</p>'+form()+'</section>'
+ +'<section id="evo-regua"><h2>Régua e limites</h2><dl class="regua-t"><dt>1–3</dt><dd>Falta ou quebra: a pessoa não consegue ou desiste.</dd><dt>4–6</dt><dd>Funciona, com atritos claros.</dd><dt>7–8</dt><dd>Bom; atritos pequenos.</dd><dt>9–10</dt><dd>Referência da categoria.</dd></dl>'
+ +'<ul class="lim"><li>Avaliação especialista, feita sem usuários. Os primeiros usuários reais são o teste definitivo.</li><li>Os outros apps foram avaliados pelo que é público (lojas, sites, análises), sem uso direto. Notas aproximadas.</li><li>Fidelidade à doutrina e segurança emocional usam os princípios do AVR-S como régua.</li><li>Qualidade da IA fica sem nota até haver conversas reais para avaliar.</li><li>Uso interno: as notas dos outros apps são estimativas e não servem para material de divulgação.</li></ul></section></div>';
+
+// base das notas
+var baseEl=document.getElementById('evo-base');
+root.querySelectorAll('th button[data-app]').forEach(function(b){b.addEventListener('click',function(){
+  var on=b.getAttribute('aria-pressed')==='true';
+  root.querySelectorAll('th button[data-app]').forEach(function(x){x.setAttribute('aria-pressed','false')});
+  if(on){baseEl.hidden=true;return}
+  b.setAttribute('aria-pressed','true');
+  var a=S.apps.filter(function(x){return x.n===b.dataset.app})[0];
+  baseEl.innerHTML='<b>'+esc(a.n)+'</b><p>'+esc(a.base)+'</p><p class="muted">Confiança na nota: '+esc(a.conf)+'.</p>';baseEl.hidden=false;
+})});
+
+// salvar (Firestore, via função recebida do Cockpit)
+var st=document.getElementById('evo-status'),btn=document.getElementById('evo-save');
+function msg(t,err){st.textContent=t;st.className=err?'err':''}
+function publicar(next,okMsg){
+  btn.disabled=true;msg('Salvando…');
+  salvar(next).then(function(){msg(okMsg)}).catch(function(e){msg('Não foi possível salvar ('+((e&&e.code)||'erro')+'). Tente de novo.',true);btn.disabled=false});
+}
+document.getElementById('evo-f').addEventListener('submit',function(ev){
+  ev.preventDefault();
+  var d=document.getElementById('evo-fd').value,m=document.getElementById('evo-fm').value.trim();
+  if(!d){msg('Escolha a data da avaliação.',true);return}
+  if(!m){msg('Descreva o marco, por exemplo o que foi publicado.',true);document.getElementById('evo-fm').focus();return}
+  if(S.av.some(function(a){return a.d===d})){msg('Já existe uma avaliação em '+dataBR(d)+'. Escolha outra data.',true);return}
+  var v={};S.dims.forEach(function(x){v[x.k]=parseInt(document.getElementById('evo-d_'+x.k).value,10)});
+  var next=JSON.parse(JSON.stringify(S));next.av.push({d:d,m:m,v:v});
+  publicar(next,'Avaliação salva.');
+});
+var undo=document.getElementById('evo-undo');
+if(undo)undo.addEventListener('click',function(){
+  if(!confirm('Remover a avaliação de '+dataBR(last.d)+' ('+last.m+')?'))return;
+  var next=JSON.parse(JSON.stringify(S));
+  next.av=next.av.filter(function(a){return a.d!==last.d});
+  publicar(next,'Avaliação removida.');
+});
+};
+</script>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getFirestore, collection, onSnapshot, doc, setDoc, deleteDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const firebaseConfig={apiKey:"AIzaSyBy13fDtxYQlkMozofoIoYS27VykHMMuDw",authDomain:"avrs-app.firebaseapp.com",projectId:"avrs-app",storageBucket:"avrs-app.firebasestorage.app",messagingSenderId:"1036042586771",appId:"1:1036042586771:web:b4a9bac3dcc7c0ce461b66"};
+const ADMIN_EMAIL = "audax2_cj@hotmail.com";
+const SEED = [{"id": "p01", "pilar": "Livros / Editorial", "projeto": "A Vida Sem Rascunho", "descricao": "35 caps, 234 pgs, ISBN 978-65-02-20116-9. Livro do método (3º na ordem de leitura).", "status": "Em produção final", "pct": 0.98, "prioridade": "Alta", "proximo": "Gráfica em 13/10. Ajustes da prova \"CORRIGIDO\" ficam para a 2ª edição.", "ref": "Trilogia · gráfica 13/10/2026 · lançamento a definir"}, {"id": "p02", "pilar": "Livros / Editorial", "projeto": "A Mente É a Causa, A Vida É o Efeito", "descricao": "25 caps, 314 pgs. Teoria unificada; lente de leitura (Livro 2).", "status": "Em produção final", "pct": 0.98, "prioridade": "Alta", "proximo": "Conferir título completo em capa, lombada e folha de rosto (CIP registrou sem vírgula). Gráfica em 13/10.", "ref": "Trilogia · gráfica 13/10/2026 · lançamento a definir"}, {"id": "p03", "pilar": "Livros / Editorial", "projeto": "Crônicas de um Campeão", "descricao": "38 caps, ~253 pgs. Despertar; abre a leitura (Livro 1).", "status": "Em produção final", "pct": 0.95, "prioridade": "Alta", "proximo": "Checagem final: \"covardia\" no Cap. 2, neologismos \"relistando\"/\"desconfirmar\", folha de dedicatória. Gráfica em 13/10.", "ref": "Trilogia · gráfica 13/10/2026 · lançamento a definir"}, {"id": "p04", "pilar": "Livros / Editorial", "projeto": "Lançamento da Trilogia", "descricao": "Livros 1–3 lançam juntos como produto completo; Como os Sonhos entra só como promessa/pré-venda.", "status": "Aguardando decisão", "pct": 0.5, "prioridade": "Alta", "proximo": "Gráfica confirmar se os 15 dias são corridos (~28/10) ou úteis (~04/11); depois fechar a data de lançamento.", "ref": "Gráfica 13/10/2026"}, {"id": "p05", "pilar": "Livros / Editorial", "projeto": "Como os Sonhos Morrem e Como Ressuscitá-los", "descricao": "Livro 4 — Reconstrução; fecha a Tetralogia. ~40 mil palavras, 3 partes, 12 caps.", "status": "Em andamento", "pct": 0.6, "prioridade": "Alta", "proximo": "Manuscrito completo. Lançamento solo em jan/2027; pré-venda no lançamento da Trilogia.", "ref": "Lançamento jan/2027"}, {"id": "p06", "pilar": "Livros / Editorial", "projeto": "CCR — O Campo de Consciência Relacional", "descricao": "Livro 5 — Relações. v2.4-FINAL, ~29 mil palavras, 20 caps, 16 diagramas.", "status": "Aguardando decisão", "pct": 0.75, "prioridade": "Média", "proximo": "Sem data de lançamento; vem depois de Como os Sonhos Morrem.", "ref": "Livro 5"}, {"id": "p07", "pilar": "Livros / Editorial", "projeto": "A Escolha da Resposta", "descricao": "Livro 6 — pilar Resposta, eixo o tempo. ~34 mil palavras, 12 caps em 4 Partes.", "status": "Em andamento", "pct": 0.6, "prioridade": "Média", "proximo": "Aplicar as seis intervenções e a curva dos finais a partir dos pilotos dos Caps. 2 e 8. Fusão Caps 2+10 em aberto.", "ref": "A_Escolha_da_Resposta_v6_pilotos_Caps2e8.docx"}, {"id": "p08", "pilar": "Livros / Editorial", "projeto": "A Teoria do Espelho", "descricao": "Livro 7 — pilar Visão, eixo o eu/identidade. 15 caps, ~50 mil palavras.", "status": "Em andamento", "pct": 0.7, "prioridade": "Média", "proximo": "Diferenciar os pares de capítulos redundantes (11/15 legado; 13/14 futuro), sem fusão.", "ref": "Substitui O Nome que Você Assina"}, {"id": "p09", "pilar": "Livros / Editorial", "projeto": "Livros 8 a 11", "descricao": "A Prisão Sem Muros (8), A Economia da Atenção (9), O Sistema (10), A Biografia (11).", "status": "Planejado", "pct": 0.1, "prioridade": "Baixa", "proximo": "Parqueados pós-lançamento. L9 é o mais desenvolvido.", "ref": "Ordem canônica dos 11 livros"}, {"id": "p10", "pilar": "Livros / Editorial", "projeto": "Editora AVR-S", "descricao": "Selo editorial do ecossistema; abertura enxuta, por fases.", "status": "Planejado", "pct": 0.1, "prioridade": "Baixa", "proximo": "Pós-lançamento: alteração contratual da Audax com CNAE 5811-5/00; avaliar tributação e registro CRC.", "ref": "Nome fantasia/selo sob a Audax"}, {"id": "p11", "pilar": "Livros / Editorial", "projeto": "Divulgação e venda dos livros", "descricao": "Venda direta, sem livrarias (perderia 50%).", "status": "Aguardando decisão", "pct": 0.1, "prioridade": "Alta", "proximo": "Definir a estratégia de divulgação partindo da venda sem livrarias.", "ref": "—"}, {"id": "p12", "pilar": "App AVR-S", "projeto": "Reforma de segurança isPro", "descricao": "Worker avrs-proxy como fonte de autoridade; Firestore rules v3; contagem de IA no servidor.", "status": "Concluído", "pct": 1.0, "prioridade": "Alta", "proximo": "Concluída e verificada. Nada pendente.", "ref": "Worker /status-pro"}, {"id": "p13", "pilar": "App AVR-S", "projeto": "Fechamento do Dia (bug data)", "descricao": "Variável de data não recalculada no virar do dia.", "status": "Concluído", "pct": 1.0, "prioridade": "Alta", "proximo": "Bug resolvido.", "ref": "—"}, {"id": "p14", "pilar": "App AVR-S", "projeto": "Pix Pro / PagBank", "descricao": "Fluxo de pagamento Pix com Worker + Firebase polling. Pro a R$ 39,99/mês.", "status": "Concluído", "pct": 1.0, "prioridade": "Alta", "proximo": "Worker v3.2 publicado em 30/09 cobrando R$ 39,99.", "ref": "Worker /checkout/pix"}, {"id": "p15", "pilar": "App AVR-S", "projeto": "GA4 — Instrumentação", "descricao": "Google Analytics 4 instalado e validado (G-0DNXT1ZCZC).", "status": "Concluído", "pct": 1.0, "prioridade": "Média", "proximo": "Fila: painel de métricas no Cockpit.", "ref": "—"}, {"id": "p16", "pilar": "App AVR-S", "projeto": "Jornada da Reconstrução", "descricao": "Jornada de 14 dias por contagem; M1 A Causa livre com mini-espelho, M2–M4 Pro.", "status": "Em desenvolvimento", "pct": 0.6, "prioridade": "Alta", "proximo": "Seguir com o M1 e a Jornada mínima no index.html.", "ref": "AVRS_Arquitetura_App_v2.docx"}, {"id": "p17", "pilar": "App AVR-S", "projeto": "App dos Espelhos + lançador Ecossistema", "descricao": "Lançador no ar: Espelhos, Finance e CCR (Núcleo Solo) com um login e um Pro só.", "status": "Em andamento", "pct": 0.7, "prioridade": "Alta", "proximo": "Recriar o CNAME (app.avrs.com.br) e testar o fluxo completo: login no iframe, espelho, convite, Evolução, persistência.", "ref": "AVRS_App_Federado.html"}, {"id": "p18", "pilar": "App AVR-S", "projeto": "A Noite do Amanhecer", "descricao": "Fechamento do Dia arma o Despertar (frase-estado + linha). Construído dentro do index.html.", "status": "Em desenvolvimento", "pct": 0.35, "prioridade": "Média", "proximo": "Incremento 2: devolução no despertarOverlay (frase primeiro, linha no 2º tempo).", "ref": "Doc-semente v0.7"}, {"id": "p19", "pilar": "App AVR-S", "projeto": "Mapa do Dia", "descricao": "Mapeamento retrospectivo do dia por perguntas-espelho; módulo dentro do app.", "status": "Estruturado", "pct": 0.15, "prioridade": "Baixa", "proximo": "Arquitetura fechada; aguardando vez na fila.", "ref": "Doc-semente v0.1"}, {"id": "p20", "pilar": "App AVR-S", "projeto": "Cadastro com verificação de e-mail (F-15)", "descricao": "Cadastro obrigatório por e-mail e senha, com verificação do e-mail.", "status": "Planejado", "pct": 0.1, "prioridade": "Média", "proximo": "Implementar a verificação de e-mail no cadastro.", "ref": "Decisão de 30/09/2026"}, {"id": "p21", "pilar": "App AVR-S", "projeto": "Meta de evolução até 10/11", "descricao": "Aproximar o app dos principais concorrentes nos itens funcionais.", "status": "Em andamento", "pct": 0.5, "prioridade": "Alta", "proximo": "Atacar Facilidade na interação, Progressão e Motivo para voltar (6 → 7 cada). Meta: 6,9 em 10/11.", "ref": "Seção Evolução do App, no Cockpit"}, {"id": "p22", "pilar": "App AVR-S Finance", "projeto": "AVR-S Finance (PWA)", "descricao": "App financeiro (finance.html). Índice de Consciência comportamental. Já no lançador.", "status": "Em desenvolvimento", "pct": 0.6, "prioridade": "Média", "proximo": "Rota própria /finance/coach no Worker (pós-lançamento).", "ref": "AVRS_Finance_Documento_de_Produto_v1.0.docx"}, {"id": "p23", "pilar": "Negócio", "projeto": "AVR-S Profissional (IA com método)", "descricao": "IA ancorada no RAVRS/livros/Diário, só para profissionais; junta Espelho + CCR-NET.", "status": "Estruturado", "pct": 0.1, "prioridade": "Média", "proximo": "Fechar as decisões em aberto no documento-semente.", "ref": "Nome provisório"}, {"id": "p24", "pilar": "Negócio", "projeto": "Plano de Correção de Gargalo de Vazão", "descricao": "4 fases: assistente virtual → workshops gravados → curso Jornada → piloto de certificação.", "status": "Planejado", "pct": 0.2, "prioridade": "Média", "proximo": "Iniciar a fase 1.", "ref": "Painel negócio unificado"}, {"id": "p25", "pilar": "TCA-AVR-S / Fundação", "projeto": "Manuscrito TCA-AVR-S", "descricao": "Edição Fundacional v3.5, Caps. 0–27, com CCR e Apêndice II para palestras.", "status": "Em andamento", "pct": 0.95, "prioridade": "Média", "proximo": "Aprovar o documento consolidado v0.2 (Cognição, Consciência e Sentido nos cinco movimentos).", "ref": "Fora dos 11 livros"}, {"id": "p26", "pilar": "TCA-AVR-S / Fundação", "projeto": "Governança de certificação", "descricao": "TCA-AVR-013: 8 seções, avaliação 3 sondagens, recertificação 12 meses.", "status": "Concluído", "pct": 1.0, "prioridade": "Média", "proximo": "Documento produzido.", "ref": "TCA-AVR-013"}, {"id": "p27", "pilar": "TCA-AVR-S / Fundação", "projeto": "Identidade + Registro Público", "descricao": "Bandeira/selo da Fundação; schema Firestore Pré-Registro; página Registro Público.", "status": "Pendente / em risco", "pct": 0.2, "prioridade": "Baixa", "proximo": "Definir selo; construir Registro Público antes do 1º facilitador externo.", "ref": "avrs.com.br"}, {"id": "p28", "pilar": "TCA-AVR-S / Fundação", "projeto": "Documento-Mestre para o Alex", "descricao": "Contexto do ecossistema em 8 seções para atualizar o Alex (ChatGPT).", "status": "Em andamento", "pct": 0.2, "prioridade": "Média", "proximo": "Escrever a partir da seção de doutrina.", "ref": "—"}, {"id": "p29", "pilar": "Cursos", "projeto": "Formação AVR-S — Consciência Aplicada", "descricao": "Curso presencial. v3.0: 10 encontros semanais, 25h, turma Rio até 15.", "status": "Aguardando decisão", "pct": 0.6, "prioridade": "Média", "proximo": "Decidir corte para 7–8 encontros; abertura da Aula 0; verificações de capítulo; sala/dia/horário/preço/data.", "ref": "Formacao_AVRS_Presencial_v3.0.docx"}, {"id": "p30", "pilar": "Cursos", "projeto": "Jornada da Transformação", "descricao": "Curso gravado + ao vivo. 12 semanas, 5 módulos, ~45 aulas.", "status": "Planejado", "pct": 0.2, "prioridade": "Baixa", "proximo": "Roteiros e gravação. Turma 1 depois do Carnaval/2027.", "ref": "Curso_Jornada_da_Transformacao_v1.0.docx"}, {"id": "p31", "pilar": "Consultoria Audax", "projeto": "Clientes externos", "descricao": "ANTTUR, ADESG, compliance trabalhista, palestras/workshops.", "status": "Em andamento", "pct": 0.5, "prioridade": "Média", "proximo": "Acompanhamento recorrente — status detalhado a confirmar.", "ref": "Audax Consultoria"}, {"id": "p32", "pilar": "Marketing / Marca", "projeto": "Landing page avrs.com.br", "descricao": "Página da Trilogia com reserva (Formspree) + 3 PDFs lead magnet.", "status": "Concluído", "pct": 1.0, "prioridade": "Média", "proximo": "Atualizar data e preço quando o lançamento da Trilogia for fechado.", "ref": "Formspree xrevpwen"}, {"id": "p33", "pilar": "Marketing / Marca", "projeto": "INPI — marca AVR-S", "descricao": "Processo 944047670, Classe 41. Depositado.", "status": "Em andamento", "pct": 0.6, "prioridade": "Média", "proximo": "Aguardar exame/deferimento INPI.", "ref": "Classe 41"}, {"id": "p34", "pilar": "Marketing / Marca", "projeto": "Instagram @metodo.avrs", "descricao": "Cadência 4x/semana combinada, não está sendo mantida.", "status": "Pendente / em risco", "pct": 0.15, "prioridade": "Média", "proximo": "Definir estratégia de batch/agendamento ou delegar produção.", "ref": "—"}, {"id": "p35", "pilar": "Marketing / Marca", "projeto": "Pitch Rio2C (pitch.avrs.com.br)", "descricao": "Apresentação interativa no ar com HTTPS via GitHub Pages.", "status": "Concluído", "pct": 1.0, "prioridade": "Baixa", "proximo": "Sem pressa: limpar restos do Manus e aposentar o Worker antigo.", "ref": "repo avrs-pitch"}, {"id": "p36", "pilar": "Marketing / Marca", "projeto": "Apresentação pública para redes", "descricao": "Versão do AVR-S voltada ao público, com as informações essenciais.", "status": "Planejado", "pct": 0.05, "prioridade": "Média", "proximo": "Montar a partir do pitch.", "ref": "—"}, {"id": "p37", "pilar": "Gestão", "projeto": "Cockpit do Projeto", "descricao": "Painel privado: login por e-mail feito; aba Projetos atualizada.", "status": "Em andamento", "pct": 0.5, "prioridade": "Média", "proximo": "Fase 1: levar status dos checklists e notas para o Firestore. Fase 2: conteúdo fixo.", "ref": "repo avrs-cockpit"}, {"id": "p38", "pilar": "Gestão", "projeto": "Agenda pessoal", "descricao": "Página única HTML com pendências do escritório e do AVR-S.", "status": "Concluído", "pct": 1.0, "prioridade": "Média", "proximo": "Versão 1 aprovada (out/2026).", "ref": "—"}];
+
+const app = initializeApp(firebaseConfig, "cockpit");
+const auth = getAuth(app);
+const db = getFirestore(app);
+const col = collection(db, "projetos");
+
+// ---- Evolução do App AVR-S (coleção evolucao_app) ----
+// config = dimensões, apps de referência, matriz e meta; av_AAAA-MM-DD = uma avaliação cada.
+const EVO_CFG_SEED = {"ref": "Daylio", "dims": [{"k": "acesso", "n": "Acesso", "g": "Suas 4", "c": true}, {"k": "facilidade", "n": "Facilidade na interação", "g": "Suas 4", "c": true}, {"k": "funcionalidades", "n": "Funcionalidades", "g": "Suas 4", "c": true}, {"k": "progressao", "n": "Progressão", "g": "Suas 4", "c": true}, {"k": "tempo", "n": "Tempo até o primeiro valor", "g": "Experiência", "c": true}, {"k": "clareza", "n": "Clareza da linguagem", "g": "Experiência", "c": true}, {"k": "acessibilidade", "n": "Acessibilidade", "g": "Experiência", "c": false}, {"k": "consistencia", "n": "Consistência entre os apps", "g": "Experiência", "c": false}, {"k": "voltar", "n": "Motivo para voltar", "g": "Experiência", "c": true}, {"k": "doutrina", "n": "Fidelidade à doutrina", "g": "AVR-S", "c": false}, {"k": "seguranca", "n": "Segurança emocional", "g": "AVR-S", "c": false}, {"k": "pro", "n": "Proposta de valor do Pro", "g": "Negócio", "c": false}, {"k": "confiabilidade", "n": "Confiabilidade", "g": "Técnico", "c": false}, {"k": "desempenho", "n": "Desempenho", "g": "Técnico", "c": false}, {"k": "privacidade", "n": "Privacidade e segurança", "g": "Técnico", "c": false}], "apps": [{"n": "Daylio", "conf": "Média", "base": "App Store (EUA): 4,8 com 62 mil avaliações. Primeiro registro em dois passos, sem conta; dados no aparelho; acessibilidade declarada. Contra: metas por sequência.", "v": {"acesso": 9, "facilidade": 9, "funcionalidades": 7, "progressao": 8, "tempo": 9, "clareza": 8, "acessibilidade": 9, "voltar": 8, "pro": 8, "confiabilidade": 8, "privacidade": 9}}, {"n": "How We Feel", "conf": "Média", "base": "App Store (EUA): 4,9 com 30 mil; Editors' Choice. Nomeação precisa de emoções; estratégias de 1 minuto; gratuito; dados no aparelho. Contra: só iPhone.", "v": {"acesso": 8, "facilidade": 8, "funcionalidades": 8, "progressao": 7, "tempo": 8, "clareza": 9, "voltar": 8, "privacidade": 9}}, {"n": "Stoic", "conf": "Média", "base": "App Store (EUA): 4,8 com 36 mil; Editors' Choice. Rituais de manhã e noite; Journey e Trends; widgets e lembretes. Contra: muitas opções logo de cara; sequências e medalhas.", "v": {"acesso": 8, "facilidade": 7, "funcionalidades": 9, "progressao": 8, "tempo": 7, "clareza": 8, "voltar": 9, "pro": 8, "privacidade": 8}}, {"n": "Headspace", "conf": "Média", "base": "App Store: 4,8; US$ 12,99/mês. Onboarding curto e conteúdo estruturado. Contra: paywall antes de usar; quase nada gratuito.", "v": {"acesso": 6, "facilidade": 8, "funcionalidades": 8, "progressao": 7, "tempo": 6, "clareza": 9, "voltar": 8, "pro": 6}}, {"n": "YNAB", "conf": "Baixa", "base": "Análises de terceiros (CNBC Select, Finder). Teste de 34 dias; educação junto com a ferramenta. Contra: configuração inicial de ~20 min; interface carregada.", "v": {"acesso": 6, "facilidade": 5, "funcionalidades": 8, "progressao": 7, "tempo": 4, "clareza": 7, "voltar": 7, "pro": 8}}, {"n": "Paired", "conf": "Baixa", "base": "Site oficial (4,7 na App Store) e análise de avaliações da categoria. Pergunta do dia gratuita; profundidade gradual. Contra: conteúdo trancado cedo; depende do parceiro.", "v": {"acesso": 6, "facilidade": 8, "funcionalidades": 7, "progressao": 6, "tempo": 6, "clareza": 8, "voltar": 8, "pro": 6}}], "meta": {"d": "2026-11-10", "m": "Mais perto dos maiores concorrentes nos itens funcionais (revisada em 05/10: cadastro obrigatório mantido)", "v": {"acesso": 5, "facilidade": 7, "funcionalidades": 8, "progressao": 7, "tempo": 6, "clareza": 8, "acessibilidade": 6, "consistencia": 7, "voltar": 7, "doutrina": 8, "seguranca": 8, "pro": 7, "confiabilidade": 7, "desempenho": 5, "privacidade": 7}}};
+const EVO_AV_SEED = [{"d": "2026-09-24", "m": "Ponto de partida, antes dos ajustes", "v": {"acesso": 5, "facilidade": 6, "funcionalidades": 8, "progressao": 6, "tempo": 4, "clareza": 7, "acessibilidade": 3, "consistencia": 7, "voltar": 6, "doutrina": 8, "seguranca": 5, "pro": 5, "confiabilidade": 7, "desempenho": 5, "privacidade": 7}}, {"d": "2026-10-05", "m": "Após F-05, F-14, preço R$ 39,99 e correções de linguagem (30/09)", "v": {"acesso": 5, "facilidade": 6, "funcionalidades": 8, "progressao": 6, "tempo": 4, "clareza": 8, "acessibilidade": 3, "consistencia": 7, "voltar": 6, "doutrina": 8, "seguranca": 7, "pro": 5, "confiabilidade": 7, "desempenho": 5, "privacidade": 7}}, {"d": "2026-10-06", "m": "Boas-vindas no primeiro acesso (estado → resposta do Despertar → entrar)", "v": {"acesso": 5, "facilidade": 6, "funcionalidades": 8, "progressao": 6, "tempo": 6, "clareza": 8, "acessibilidade": 3, "consistencia": 7, "voltar": 6, "doutrina": 8, "seguranca": 7, "pro": 5, "confiabilidade": 7, "desempenho": 5, "privacidade": 7}}];
+const evoCol = collection(db, "evolucao_app");
+let evoUnsub = null, evoCfg = null, evoAv = [], evoSemeando = false;
+function evoAviso(t){ $("evo-panel").innerHTML = '<p class="evo-load">'+esc(t)+'</p>'; }
+function evoRender(){
+  if (!evoCfg) return;
+  if (!evoAv.length) { evoAviso("Nenhuma avaliação registrada."); return; }
+  try { window.renderEvolucao({ ...evoCfg, av: evoAv.map(a=>({d:a.d, m:a.m, v:a.v})) }, $("evo-panel"), evoSalvar); }
+  catch(e){ console.error(e); evoAviso("Erro ao montar a evolução."); }
+}
+async function evoSalvar(next){
+  const atuais = new Set(evoAv.map(a=>a.d)), novos = new Set(next.av.map(a=>a.d));
+  for (const a of next.av) if (!atuais.has(a.d)) await setDoc(doc(db,"evolucao_app","av_"+a.d), { d:a.d, m:a.m, v:a.v, criado_em: serverTimestamp() });
+  for (const d of atuais) if (!novos.has(d)) await deleteDoc(doc(db,"evolucao_app","av_"+d));
+}
+async function evoSemear(){
+  evoSemeando = true;
+  try {
+    for (const a of EVO_AV_SEED) await setDoc(doc(db,"evolucao_app","av_"+a.d), { ...a, criado_em: serverTimestamp() });
+    await setDoc(doc(db,"projetos","p21"), { pct:0.5, proximo:"Atacar Facilidade na interação, Progressão e Motivo para voltar (6 → 7 cada). Meta: 6,9 em 10/11.", ref:"Seção Evolução do App, no Cockpit", atualizado_em: serverTimestamp() }, { merge:true });
+    await setDoc(doc(db,"evolucao_app","config"), { ...EVO_CFG_SEED, atualizado_em: serverTimestamp() });
+  } catch(e){ evoSemeando = false; evoAviso("Não foi possível criar a evolução ("+e.code+"). Confira as regras do Firestore para a coleção evolucao_app."); }
+}
+function assinarEvo(){
+  if (evoUnsub) return;
+  evoUnsub = onSnapshot(evoCol, snap => {
+    let cfg = null; const av = [];
+    snap.docs.forEach(d => { if (d.id === "config") cfg = d.data(); else if (d.id.startsWith("av_")) av.push(d.data()); });
+    if (!cfg) { if (!evoSemeando) evoSemear(); return; }
+    evoCfg = cfg; evoAv = av.sort((a,b)=> a.d<b.d?-1:a.d>b.d?1:0); evoRender();
+  }, err => evoAviso("Erro ao ler a evolução ("+err.code+"). Confira as regras do Firestore para a coleção evolucao_app."));
+}
+
+
+const CORES = {
+  "Concluído":            {c:"#7bc47f", b:"rgba(123,196,127,.35)", bg:"rgba(123,196,127,.10)"},
+  "Em produção final":    {c:"#d4b87a", b:"rgba(212,184,122,.35)", bg:"rgba(212,184,122,.10)"},
+  "Em desenvolvimento":   {c:"#d4b87a", b:"rgba(212,184,122,.35)", bg:"rgba(212,184,122,.10)"},
+  "Em andamento":         {c:"#d4b87a", b:"rgba(212,184,122,.35)", bg:"rgba(212,184,122,.10)"},
+  "Estruturado":          {c:"#7aa2d4", b:"rgba(122,162,212,.35)", bg:"rgba(122,162,212,.10)"},
+  "Planejado":            {c:"#7aa2d4", b:"rgba(122,162,212,.35)", bg:"rgba(122,162,212,.10)"},
+  "Aguardando decisão":   {c:"#d47a7a", b:"rgba(212,122,122,.35)", bg:"rgba(212,122,122,.10)"},
+  "Pendente / em risco":  {c:"#d47a7a", b:"rgba(212,122,122,.35)", bg:"rgba(212,122,122,.10)"},
+};
+const esc = s => (s==null?"":String(s)).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
+
+const $ = id => document.getElementById(id);
+let dados = [];
+let editId = null;
+
+// ---- Auth (login único do Cockpit) ----
+function mostrarErro(t){ $("login-msg").style.display="none"; $("login-err").textContent=t; $("login-err").style.display=t?"block":"none"; }
+function mostrarMsg(t){ $("login-err").style.display="none"; $("login-msg").textContent=t; $("login-msg").style.display="block"; }
+
+async function entrar(){
+  const email=$("login-email").value.trim(), senha=$("login-pass").value;
+  if(!email||!senha){ mostrarErro("Preencha e-mail e senha."); return; }
+  mostrarErro(""); $("login-btn").disabled=true;
+  try { await signInWithEmailAndPassword(auth, email, senha); }
+  catch(e){
+    mostrarErro(e.code==="auth/too-many-requests"
+      ? "Muitas tentativas. Aguarde alguns minutos ou use “Esqueci a senha”."
+      : "E-mail ou senha incorretos.");
+    $("login-pass").value=""; $("login-pass").focus();
+  }
+  finally { $("login-btn").disabled=false; }
+}
+$("login-btn").addEventListener("click", entrar);
+$("login-pass").addEventListener("keydown", e => { if (e.key === "Enter") entrar(); });
+$("login-email").addEventListener("keydown", e => { if (e.key === "Enter") $("login-pass").focus(); });
+
+$("login-forgot").addEventListener("click", async () => {
+  const email=$("login-email").value.trim();
+  if(!email){ mostrarErro("Digite seu e-mail acima e toque de novo em “Esqueci a senha”."); $("login-email").focus(); return; }
+  try {
+    auth.languageCode="pt-BR";
+    await sendPasswordResetEmail(auth, email);
+    mostrarMsg("Se este e-mail tiver acesso, o link para criar uma nova senha chega em instantes. Confira também o lixo eletrônico.");
+  } catch(e){
+    mostrarErro(e.code==="auth/invalid-email" ? "E-mail inválido." : "Não foi possível enviar agora. Tente de novo em alguns minutos.");
+  }
+});
+
+const sair = () => signOut(auth);
+$("btn-sair").addEventListener("click", sair);
+$("prj-signout").addEventListener("click", sair);
+
+onAuthStateChanged(auth, user => {
+  const ok = user && (user.email || "").toLowerCase() === ADMIN_EMAIL.toLowerCase();
+  $("login-checking").style.display = "none";
+  $("login-form").style.display = "flex";
+  if (user && !ok) { mostrarErro("Esta conta não tem acesso ao Cockpit."); signOut(auth); return; }
+  $("login-overlay").style.display   = ok ? "none"  : "flex";
+  $("cockpit-content").style.display = ok ? "block" : "none";
+  $("prj-panel").style.display       = ok ? "block" : "none";
+  $("evo-section").style.display     = ok ? "block" : "none";
+  if (ok) { $("prj-who").textContent = "conectado: " + user.email; assinar(); assinarEvo(); }
+  else {
+    if (unsub) { unsub(); unsub = null; }
+    if (evoUnsub) { evoUnsub(); evoUnsub = null; }
+    $("login-pass").value = "";
+    setTimeout(()=>$("login-email").focus(), 50);
+  }
+});
+
+// ---- Live read ----
+let unsub = null;
+function assinar(){
+  if (unsub) return;
+  unsub = onSnapshot(col, snap => {
+    dados = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+    dados.sort((a,b)=> (a.id>b.id?1:-1));
+    render();
+  }, err => { $("prj-err").textContent = "Erro ao ler dados: " + err.code; });
+}
+
+// ---- Render ----
+function render(){
+  const total = dados.length || 1;
+  const cont = {};
+  dados.forEach(p => cont[p.status] = (cont[p.status]||0)+1);
+  const conclu = cont["Concluído"]||0;
+  const risco = (cont["Pendente / em risco"]||0)+(cont["Aguardando decisão"]||0);
+  const prog = Math.round(dados.reduce((s,p)=>s+(+p.pct||0),0)/total*100);
+  $("prj-kpis").innerHTML =
+    kpi(dados.length,"Projetos") + kpi(conclu,"Concluídos") + kpi(risco,"Em risco") + kpi(prog+"%","Progresso médio");
+
+  const pilares = [...new Set(dados.map(p=>p.pilar))];
+  let out = "";
+  pilares.forEach(pil => {
+    const itens = dados.filter(p=>p.pilar===pil);
+    const mp = Math.round(itens.reduce((s,p)=>s+(+p.pct||0),0)/itens.length*100);
+    out += '<div class="prj-pilar-h"><span>'+esc(pil)+'</span><span>'+mp+'%</span></div>';
+    itens.forEach(p => {
+      const cor = CORES[p.status] || {c:"#b8b0a4",b:"var(--border2)",bg:"transparent"};
+      out += '<div class="prj-row" data-id="'+esc(p.id)+'">'
+        + '<div class="top"><span class="nome">'+esc(p.projeto)+'</span>'
+        + '<span class="prj-badge" style="color:'+cor.c+';border-color:'+cor.b+';background:'+cor.bg+'">'+esc(p.status)+'</span></div>'
+        + '<div class="prj-track"><div class="prj-fill" style="width:'+Math.round((+p.pct||0)*100)+'%"></div></div>'
+        + '<div class="prj-meta">'+Math.round((+p.pct||0)*100)+'% · '+esc(p.prioridade||"")+' · '+esc(p.proximo||"")+'</div>'
+        + '</div>';
+    });
+  });
+  $("prj-list").innerHTML = out || '<div style="color:var(--text3);text-align:center;padding:20px;">Sem projetos ainda. Toque em “Semear 20”.</div>';
+  document.querySelectorAll(".prj-row").forEach(r => r.addEventListener("click", () => abrir(r.dataset.id)));
+}
+const kpi = (n,l) => '<div class="prj-kpi"><div class="n">'+n+'</div><div class="l">'+l+'</div></div>';
+
+// ---- Editor ----
+function abrir(id){
+  editId = id;
+  const p = dados.find(x=>x.id===id) || {pilar:"",projeto:"",descricao:"",status:"Pendente / em risco",pct:0,prioridade:"Média",proximo:"",ref:""};
+  $("prj-modal-title").textContent = id ? "Editar projeto" : "Novo projeto";
+  $("f-pilar").value=p.pilar||""; $("f-projeto").value=p.projeto||""; $("f-descricao").value=p.descricao||"";
+  $("f-status").value=p.status||"Pendente / em risco";
+  $("f-pct").value=Math.round((+p.pct||0)*100); $("f-pct-val").textContent=$("f-pct").value+"%";
+  $("f-prioridade").value=p.prioridade||"Média"; $("f-proximo").value=p.proximo||""; $("f-ref").value=p.ref||"";
+  $("prj-del").style.display = id ? "block" : "none";
+  $("prj-modal").classList.add("on");
+}
+$("f-pct").addEventListener("input", () => $("f-pct-val").textContent = $("f-pct").value+"%");
+$("prj-cancel").addEventListener("click", () => $("prj-modal").classList.remove("on"));
+$("prj-add").addEventListener("click", () => abrir(null));
+
+$("prj-save").addEventListener("click", async () => {
+  const id = editId || ("p" + Date.now());
+  const payload = {
+    pilar:$("f-pilar").value.trim(), projeto:$("f-projeto").value.trim(), descricao:$("f-descricao").value.trim(),
+    status:$("f-status").value, pct:(+$("f-pct").value)/100, prioridade:$("f-prioridade").value,
+    proximo:$("f-proximo").value.trim(), ref:$("f-ref").value.trim(), atualizado_em: serverTimestamp()
+  };
+  try { await setDoc(doc(db,"projetos",id), payload, {merge:true}); $("prj-modal").classList.remove("on"); }
+  catch(e){ alert("Erro ao salvar: "+e.code); }
+});
+$("prj-del").addEventListener("click", async () => {
+  if (!editId || !confirm("Excluir este projeto?")) return;
+  try { await deleteDoc(doc(db,"projetos",editId)); $("prj-modal").classList.remove("on"); }
+  catch(e){ alert("Erro ao excluir: "+e.code); }
+});
+$("prj-modal").addEventListener("click", e => { if (e.target.id==="prj-modal") $("prj-modal").classList.remove("on"); });
+
+// ---- Seed ----
+$("prj-seed").addEventListener("click", async () => {
+  const novos = new Set(SEED.map(p=>p.id));
+  const sobra = dados.filter(p=>!novos.has(p.id));
+  if (!confirm("Substituir a lista pelos "+SEED.length+" projetos atualizados (out/2026)?"+(sobra.length?"\n"+sobra.length+" projeto(s) fora da lista nova serão removidos.":""))) return;
+  try {
+    for (const p of SEED) {
+      const { id, ...rest } = p;
+      await setDoc(doc(db,"projetos",id), { ...rest, atualizado_em: serverTimestamp() });
+    }
+    for (const p of sobra) await deleteDoc(doc(db,"projetos",p.id));
+    alert("Lista atualizada: "+SEED.length+" projetos.");
+  } catch(e){ alert("Erro ao atualizar: "+e.code); }
+});
+</script>
+
+</body>
+</html>
