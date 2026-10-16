@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101114">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Equação do Tempo">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<title>Equação do Tempo · AVR-S</title>
+<style>
+:root{--bg:#101114;--panel:#191a1f;--panel2:#202127;--line:#34353d;--gold:#d6b56d;--gold2:#f0d89c;--text:#f4f1e9;--muted:#a6a5a0;--green:#78c5a0;--blue:#8ba9e8;--red:#d98a7a;
+--top:env(safe-area-inset-top,0px);--bot:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+body{padding-top:var(--top);padding-bottom:calc(68px + var(--bot))}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
+header{position:sticky;top:var(--top);z-index:5;background:var(--bg);padding:12px 18px 10px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:var(--top);background:var(--bg);z-index:10}
+header h1{margin:0;font-size:17px;font-weight:700;letter-spacing:.2px}
+header h1 small{display:block;font-size:12px;font-weight:500;color:var(--muted)}
+.chip-part{border:1px solid #5d5035;color:var(--gold2);border-radius:99px;padding:5px 11px;font-size:13px;background:none;white-space:nowrap}
+main{padding:16px 16px 8px;max-width:560px;margin:0 auto}
+.screen{display:none}.screen.on{display:block}
+h2{font-size:22px;margin:4px 0 4px;line-height:1.2}
+h3{font-size:16px;margin:0 0 8px}
+p{margin:0 0 10px}
+.muted{color:var(--muted);font-size:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+.big{display:block;width:100%;padding:18px;border-radius:16px;border:0;background:var(--gold);color:#1a1712;font-size:18px;font-weight:750;margin:6px 0 16px}
+.btn{display:inline-block;padding:12px 16px;border-radius:12px;border:1px solid #5d5035;background:none;color:var(--gold2);font-weight:650}
+.btn.full{width:100%;margin-top:8px}
+.btn.danger{border-color:#6b3d35;color:var(--red)}
+.row{display:flex;gap:10px}.row>*{flex:1}
+.stat{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:11px 12px}
+.stat .k{font-size:12px;color:var(--muted)}.stat .v{font-size:24px;font-weight:750;margin-top:2px}.stat .h{font-size:12px;color:var(--muted)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rec{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:12px 0;border-top:1px solid var(--line);font-size:14px}
+.rec:first-child{border-top:0}
+.rec b{display:block;font-size:14px}
+.rec span{color:var(--muted)}
+.del{border:0;background:none;color:var(--muted);font-size:13px;padding:4px 6px}
+.empty{color:var(--muted);font-size:14px;padding:6px 0}
+.note{border-left:2px solid var(--gold);background:#211f19;color:#d8d0bd;padding:10px 12px;border-radius:0 10px 10px 0;font-size:14px;margin:10px 0}
+.warn{border-left-color:var(--red)}
+label.f{display:block;font-size:13px;color:var(--muted);margin:12px 0 5px}
+input.t,select.t,textarea.t{width:100%;background:#121317;border:1px solid var(--line);border-radius:11px;padding:12px;font-size:16px}
+textarea.t{min-height:90px;resize:vertical}
+.bar{height:8px;background:#34353b;border-radius:99px;overflow:hidden;margin:4px 0 8px}.bar>i{display:block;height:100%;background:var(--gold);border-radius:99px}.bar.g>i{background:var(--green)}
+.bl{display:flex;justify-content:space-between;font-size:13px;color:var(--muted)}
+.rng{margin:14px 0}.rng .bl b{color:var(--text)}
+input[type=range]{width:100%;accent-color:var(--gold);height:28px}
+.formula{background:#211e17;border:1px solid #5d5035;border-radius:12px;padding:12px;text-align:center;color:var(--gold2);font-weight:650;font-size:15px;line-height:1.8;margin:8px 0}
+.formula.b{color:var(--green)}
+.leg{font-size:12px;color:var(--muted);margin-top:6px}
+details{border-top:1px solid var(--line);padding:10px 0}details summary{font-weight:650;cursor:pointer;list-style:none}details summary::-webkit-details-marker{display:none}details summary::after{content:"+";float:right;color:var(--gold)}details[open] summary::after{content:"−"}
+/* navegação inferior */
+nav{position:fixed;left:0;right:0;bottom:0;z-index:6;background:#15161a;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);padding-bottom:var(--bot)}
+nav button{border:0;background:none;color:var(--muted);padding:9px 2px 10px;font-size:12px;display:flex;flex-direction:column;align-items:center;gap:3px}
+nav button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8}
+nav button.on{color:var(--gold2)}
+/* assistente de registro */
+#wiz{position:fixed;inset:0;z-index:20;background:var(--bg);display:none;flex-direction:column;padding-top:var(--top);padding-bottom:var(--bot)}
+#wiz.on{display:flex}
+.wtop{display:flex;align-items:center;gap:12px;padding:12px 16px}
+.wtop button{border:0;background:none;color:var(--muted);font-size:15px;padding:6px 0}
+.prog{flex:1;height:4px;background:#2a2b31;border-radius:9px;overflow:hidden}.prog>i{display:block;height:100%;background:var(--gold);transition:width .25s}
+.wbody{flex:1;overflow:auto;padding:8px 18px 18px;max-width:560px;width:100%;margin:0 auto}
+.wbody h2{font-size:24px;margin:10px 0 6px}
+.wbody .q{font-size:15px;color:var(--muted);margin-bottom:18px}
+.opts{display:grid;gap:10px}
+.opts.cols3{grid-template-columns:repeat(3,1fr)}.opts.cols5{grid-template-columns:repeat(5,1fr)}.opts.cols2{grid-template-columns:1fr 1fr}
+.opt{border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:16px 10px;text-align:center;font-size:16px;font-weight:650;min-height:56px}
+.opt small{display:block;font-weight:500;font-size:12px;color:var(--muted);margin-top:3px}
+.opt.sel{border-color:var(--gold);background:#2a2516;color:var(--gold2)}
+.opts.cols5 .opt{padding:14px 0;font-size:18px}
+.scale{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin:6px 2px 18px}
+.wfoot{padding:12px 18px;max-width:560px;width:100%;margin:0 auto}
+.wfoot .big{margin:0}
+.wfoot .big:disabled{opacity:.35}
+.link{border:0;background:none;color:var(--muted);text-decoration:underline;font-size:14px;padding:10px 0;margin-top:6px}
+.sub{font-size:13px;color:var(--muted);margin:16px 0 8px}
+#toast{position:fixed;left:50%;bottom:calc(84px + var(--bot));transform:translateX(-50%);background:var(--gold2);color:#1a1712;padding:10px 16px;border-radius:12px;font-size:14px;font-weight:650;opacity:0;pointer-events:none;transition:opacity .2s;z-index:30;max-width:90vw;text-align:center}
+#toast.on{opacity:1}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Equação do Tempo<small>Instrumento da TCA · versão celular 1.0</small></h1>
+  <button class="chip-part" id="partChip" aria-label="Participante do estudo">Sem código</button>
+</header>
+
+<main>
+<!-- REGISTRAR -->
+<section class="screen on" id="sc-reg">
+  <h2>Registrar</h2>
+  <p class="muted" id="regSub">Anote cada oportunidade logo depois que ela acontecer.</p>
+  <button class="big" id="newRec">Nova oportunidade</button>
+  <div class="card">
+    <h3>Últimos registros</h3>
+    <div id="recList"><div class="empty">Nenhum registro ainda.</div></div>
+  </div>
+</section>
+
+<!-- RESULTADOS -->
+<section class="screen" id="sc-res">
+  <h2>Resultados</h2>
+  <p class="muted">Calculados a partir dos registros. Direção projetada pelos modelos ao lado da transformação observada.</p>
+  <div class="row" style="margin-bottom:12px">
+    <div><label class="f" for="resPart">Participante</label><select class="t" id="resPart"></select></div>
+    <div><label class="f" for="resSrc">Origem de V₀</label><select class="t" id="resSrc"><option value="auto">Autorrelato</option><option value="sim">Simulador</option></select></div>
+  </div>
+  <div id="resWarn"></div>
+  <div class="card">
+    <div class="grid2">
+      <div class="stat"><div class="k">P · linha de base</div><div class="v" id="rP">—</div><div class="h" id="rPn"></div></div>
+      <div class="stat"><div class="k">R · inicial</div><div class="v" id="rR">—</div><div class="h" id="rRn"></div></div>
+      <div class="stat"><div class="k">Direção · Modelo A</div><div class="v" id="rFA">—</div><div class="h" id="rFAn"></div></div>
+      <div class="stat"><div class="k">Direção · Modelo B</div><div class="v" id="rFB" style="color:var(--green)">—</div><div class="h" id="rFBn"></div></div>
+    </div>
+    <div class="stat" style="margin-top:10px"><div class="k">Transformação · observada no seguimento</div><div class="v" id="rFo">—</div><div class="h" id="rFon"></div></div>
+    <div class="note" id="rRead">Ainda não há dados suficientes para comparar.</div>
+  </div>
+  <div class="card">
+    <h3>Os Três Espelhos</h3>
+    <div class="rec"><div><b>Espelho do Passado</b><span id="mP">—</span></div></div>
+    <div class="rec"><div><b>Espelho do Presente</b><span id="mN">—</span></div></div>
+    <div class="rec"><div><b>Espelho do Futuro</b><span id="mF">—</span></div></div>
+    <p class="muted" style="margin-top:8px">O passado não condena, o presente não avalia a pessoa, o futuro mostra direção — não sentença.</p>
+  </div>
+  <div class="card">
+    <h3>V previsto × V relatado</h3>
+    <div id="vChart"></div>
+    <div class="leg"><span style="color:var(--gold)">━ A</span> &nbsp; <span style="color:var(--green)">━ B</span> &nbsp; <span style="color:var(--blue)">○ relatado</span> &nbsp; Seg. = seguimento</div>
+    <div class="note" id="vRead">Ainda não há dados suficientes.</div>
+  </div>
+  <div class="card">
+    <h3>Por fase</h3>
+    <div id="phases"></div>
+    <div class="leg">Dourado: frequência do padrão. Verde: pontos da nova resposta.</div>
+  </div>
+  <p class="muted">Resultados descritivos de um piloto, não validados. Um participante só não decide entre as hipóteses.</p>
+</section>
+
+<!-- EQUAÇÃO -->
+<section class="screen" id="sc-eq">
+  <h2>Equação</h2>
+  <p class="muted">Parâmetros do estudo. Fixe S e os ciclos antes da coleta e não altere depois.</p>
+  <div class="card">
+    <div class="rng"><div class="bl"><span>P · padrão herdado</span><b id="vP">80</b></div><input type="range" id="P" min="0" max="100" value="80"></div>
+    <div class="rng"><div class="bl"><span>R · nova resposta</span><b id="vR">30</b></div><input type="range" id="R" min="0" max="100" value="30"></div>
+    <div class="rng"><div class="bl"><span>Regulação</span><b id="vRg">80%</b></div><input type="range" id="Rg" min="1" max="100" value="80"></div>
+    <div class="rng"><div class="bl"><span>Atenção</span><b id="vA">70%</b></div><input type="range" id="A" min="1" max="100" value="70"></div>
+    <div class="rng"><div class="bl"><span>Visão</span><b id="vVi">60%</b></div><input type="range" id="Vi" min="1" max="100" value="60"></div>
+    <div class="rng"><div class="bl"><span>S · ganho por ciclo</span><b id="vS">25%</b></div><input type="range" id="S" min="0" max="100" value="25"></div>
+    <div class="rng"><div class="bl"><span>Ciclos de prática</span><b id="vC">8</b></div><input type="range" id="cycles" min="0" max="12" value="8"></div>
+    <p class="muted" style="margin:0">Regulação, Atenção e Visão começam em 1%: pelo Primeiro Evento, ninguém entra com visão zero.</p>
+  </div>
+  <div class="card">
+    <div class="grid2">
+      <div class="stat"><div class="k">Modelo A</div><div class="v" id="sFA">—</div><div class="h" id="sFAn"></div></div>
+      <div class="stat"><div class="k">Modelo B</div><div class="v" id="sFB" style="color:var(--green)">—</div><div class="h" id="sFBn"></div></div>
+    </div>
+    <p class="sub">Carga projetada (F) por ciclo</p><div id="chF"></div>
+    <p class="sub">Nova Visão (V) por ciclo</p><div id="chV"></div>
+    <div class="leg"><span style="color:var(--gold)">━ Modelo A</span> &nbsp; <span style="color:var(--green)">━ Modelo B</span> · curvas do modelo, não dados.</div>
+  </div>
+  <div class="card">
+    <h3>Fórmulas</h3>
+    <div class="formula">V₀ = Rg · A · Vi</div>
+    <p class="sub">Modelo A — ganho mais rápido no início</p>
+    <div class="formula">Vₙ₊₁ = Vₙ + S·(1 − Vₙ)<br>Rₙ₊₁ = Rₙ + S·Vₙ·(100 − Rₙ)<br>F = (1 − Vₙ)·P + Vₙ·(100 − Rₙ)</div>
+    <p class="sub">Modelo B — força maior no início, depois ajuste</p>
+    <div class="formula b">Vₙ₊₁ = Vₙ + S·Vₙ·(1 − Vₙ)<br>Rₙ₊₁ = Rₙ + S·Vₙ·(100 − Rₙ)<br>F = P·(1 − VₙRₙ/100) ÷ (1 − V₀R₀/100)</div>
+    <p class="muted">Hipóteses concorrentes, nenhuma validada. A Nova Resposta indica direção; só os resultados observados mostram a transformação.</p>
+  </div>
+</section>
+
+<!-- MAIS -->
+<section class="screen" id="sc-more">
+  <h2>Mais</h2>
+  <div class="card">
+    <h3>Definição do estudo</h3>
+    <p class="muted">Defina antes da coleta. Cada registro guarda uma cópia.</p>
+    <label class="f" for="stP">Código do participante (sem nome)</label><input class="t" id="stP" placeholder="Ex.: P01">
+    <label class="f" for="stT">Comportamento-alvo</label><input class="t" id="stT">
+    <label class="f" for="stC1">Critério 1 da nova resposta</label><input class="t" id="stC1">
+    <label class="f" for="stC2">Critério 2</label><input class="t" id="stC2">
+    <label class="f" for="stC3">Critério 3</label><input class="t" id="stC3">
+    <button class="btn full" id="saveStudy">Salvar definição</button>
+  </div>
+  <div class="card">
+    <h3>Dados</h3>
+    <p class="muted">Os registros ficam só neste aparelho. Exporte toda semana como cópia de segurança.</p>
+    <button class="btn full" id="expRec">Exportar registros (CSV)</button>
+    <button class="btn full" id="expRes">Exportar resultados (CSV)</button>
+    <button class="btn full danger" id="clearAll">Apagar todos os registros</button>
+  </div>
+  <div class="card">
+    <h3>Protocolo</h3>
+    <details><summary>Critério de entrada</summary><p class="muted">Participa quem consegue nomear o padrão que quer mudar — “sempre fiz assim, mas agora preciso mudar”. É o Primeiro Evento.</p></details>
+    <details><summary>Fases</summary><p class="muted">Linha de base (2 semanas) · Aplicação (semanas 1–4) · Consolidação (semanas 5–8) · Seguimento (4 semanas depois).</p></details>
+    <details><summary>Indicadores</summary><p class="muted">P: frequência do padrão na linha de base. R: pontos dos três critérios (0 a 2 cada). F observado: a mesma medida de P no seguimento.</p></details>
+    <details><summary>S e ciclos</summary><p class="muted">Fixados antes da coleta e nunca ajustados depois de ver os dados. Ficam guardados neste aparelho.</p></details>
+    <details><summary>Ética</summary><p class="muted">Consentimento, coleta mínima, sem nomes. Não usar para diagnóstico nem avaliação de desempenho.</p></details>
+  </div>
+  <div class="card">
+    <p style="color:var(--gold2)">“O passado não representa o futuro, e o futuro não representa o passado. O presente conecta ambos por meio da consciência: é ela que permite uma Nova Visão da experiência, a escolha de uma nova resposta e, pela ação e consolidação, a construção de uma trajetória diferente.”</p>
+    <p class="muted" style="margin:0">TCA v3.7 · Interlúdio II · Espelho, nunca juiz.</p>
+  </div>
+</section>
+</main>
+
+<nav aria-label="Navegação">
+  <button class="on" data-sc="sc-reg"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Registrar</button>
+  <button data-sc="sc-res"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Resultados</button>
+  <button data-sc="sc-eq"><svg viewBox="0 0 24 24"><path d="M3 17c4 0 5-10 9-10s5 10 9 10"/></svg>Equação</button>
+  <button data-sc="sc-more"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg>Mais</button>
+</nav>
+
+<!-- ASSISTENTE -->
+<div id="wiz" role="dialog" aria-modal="true" aria-label="Nova oportunidade">
+  <div class="wtop"><button id="wBack">Voltar</button><div class="prog"><i id="wProg"></i></div><button id="wClose">Fechar</button></div>
+  <div class="wbody" id="wBody"></div>
+  <div class="wfoot"><button class="big" id="wNext">Continuar</button></div>
+</div>
+<div id="toast" role="status"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const fmt=(n,d=1)=>Number(n).toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const KEY_REC='tca_eqtempo_registros_v1',KEY_STUDY='tca_eqtempo_estudo_v1',KEY_SIM='tca_eqtempo_sim_v1';
+const PHASES={base:'Linha de base',aplicacao:'Aplicação',consolidacao:'Consolidação',seguimento:'Seguimento'};
+const PH_ORDER=['base','aplicacao','consolidacao','seguimento'];
+const STUDY_DEF={participant:'',target:'Reação defensiva diante de críticas profissionais',c1:'Ouvir a crítica antes de responder',c2:'Distinguir o conteúdo da crítica da interpretação de desrespeito',c3:'Responder de forma pertinente, sem reação desproporcional'};
+function load(k,def){try{const v=localStorage.getItem(k);return v?JSON.parse(v):def}catch(e){return def}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){toast('Não foi possível salvar neste aparelho.')}}
+const getRecords=()=>load(KEY_REC,[]);const setRecords=r=>save(KEY_REC,r);
+const getStudy=()=>({...STUDY_DEF,...load(KEY_STUDY,{})});
+function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function hojeLocal(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function dataBR(iso){if(!iso)return '';const [y,m,d]=iso.split('-');return `${d}/${m}`}
+let tt;function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),2400)}
+async function exportFile(name,text){const blob=new Blob(['\ufeff'+text],{type:'text/csv;charset=utf-8'});try{const file=new File([blob],name,{type:'text/csv'});if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:name});return}}catch(e){if(e&&e.name==='AbortError')return}const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+const csvRow=row=>row.map(x=>'"'+String(x??'').replace(/"/g,'""')+'"').join(';');
+
+/* ---------- modelos ---------- */
+function evolve(P,R0,V0,S,n){let V=V0,R=R0;for(let i=0;i<n;i++){R=R+S*V*(100-R);V=V+S*(1-V)}return {V,R,F:(1-V)*P+V*(100-R)}}
+function evolveB(P,R0,V0,S,n){let V=V0,R=R0;for(let i=0;i<n;i++){R=R+S*V*(100-R);V=V+S*V*(1-V)}const d=1-V0*R0/100;return {V,R,F:d>0?P*(1-V*R/100)/d:0}}
+function series(fn,P,R0,V0,S,n){const o=[];for(let k=0;k<=n;k++)o.push(fn(P,R0,V0,S,k));return o}
+function lineChart(host,data,maxY,fmtY,labels){const W=320,H=160,pl=32,pr=14,pt=8,pb=22;const n=data[0].pts.length;const x=i=>pl+(n>1?i*(W-pl-pr)/(n-1):0),y=v=>pt+(H-pt-pb)*(1-v/maxY);let g='';[0,.5,1].forEach(t=>{const yy=y(maxY*t);g+=`<line x1="${pl}" x2="${W-pr}" y1="${yy}" y2="${yy}" stroke="#34353d"/><text x="${pl-5}" y="${yy+3}" fill="#a6a5a0" font-size="10" text-anchor="end">${fmtY(maxY*t)}</text>`});for(let i=0;i<n;i++)g+=`<text x="${x(i)}" y="${H-6}" fill="#a6a5a0" font-size="10" text-anchor="middle">${labels?labels[i]:i}</text>`;data.forEach(d=>{if(!d.dots){let seg=[];const fl=()=>{if(seg.length>1)g+=`<polyline fill="none" stroke="${d.color}" stroke-width="2.4" points="${seg.join(' ')}"/>`;seg=[]};d.pts.forEach((v,i)=>{if(v==null){fl();return}seg.push(x(i)+','+y(v))});fl()}d.pts.forEach((v,i)=>{if(v==null)return;g+=d.dots?`<circle cx="${x(i)}" cy="${y(v)}" r="5.5" fill="none" stroke="${d.color}" stroke-width="2.4"/>`:`<circle cx="${x(i)}" cy="${y(v)}" r="2.6" fill="${d.color}"/>`})});host.innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block" role="img" aria-label="Gráfico por ciclo">${g}</svg>`}
+
+/* ---------- simulador (parâmetros persistem) ---------- */
+const SIM_DEF={P:80,R:30,Rg:80,A:70,Vi:60,S:25,cycles:8};
+function getSim(){return {...SIM_DEF,...load(KEY_SIM,{})}}
+function sim(){const s={};['P','R','Rg','A','Vi','S','cycles'].forEach(k=>s[k]=+$(k).value);return s}
+function renderSim(){const s=sim();save(KEY_SIM,s);$('vP').textContent=s.P;$('vR').textContent=s.R;$('vRg').textContent=s.Rg+'%';$('vA').textContent=s.A+'%';$('vVi').textContent=s.Vi+'%';$('vS').textContent=s.S+'%';$('vC').textContent=s.cycles;
+ const v0=s.Rg*s.A*s.Vi/1e6,S=s.S/100,n=s.cycles;const a=evolve(s.P,s.R,v0,S,n),b=evolveB(s.P,s.R,v0,S,n);
+ $('sFA').textContent=fmt(a.F);$('sFAn').textContent=`V ${fmt(a.V*100)}% · R ${fmt(a.R)}`;$('sFB').textContent=fmt(b.F);$('sFBn').textContent=`V ${fmt(b.V*100)}% · R ${fmt(b.R)}`;
+ const N=Math.max(n,1);const sa=series(evolve,s.P,s.R,v0,S,N),sb=series(evolveB,s.P,s.R,v0,S,N);
+ lineChart($('chF'),[{color:'#d6b56d',pts:sa.map(o=>o.F)},{color:'#78c5a0',pts:sb.map(o=>o.F)}],Math.max(s.P,1),v=>fmt(v,0));
+ lineChart($('chV'),[{color:'#d6b56d',pts:sa.map(o=>o.V*100)},{color:'#78c5a0',pts:sb.map(o=>o.V*100)}],100,v=>fmt(v,0)+'%')}
+
+/* ---------- registros ---------- */
+function recPoints(r){if(r.c1===undefined||r.critNA||r.c1==='')return null;return (+r.c1)+(+r.c2)+(+r.c3)}
+function renderRecords(){const rs=getRecords();const st=getStudy();
+ $('partChip').textContent=st.participant||'Sem código';
+ const today=rs.filter(r=>r.date===hojeLocal()).length;$('regSub').textContent=today?`${today} registro(s) hoje.`:'Anote cada oportunidade logo depois que ela acontecer.';
+ const host=$('recList');if(!rs.length){host.innerHTML='<div class="empty">Nenhum registro ainda. Toque em “Nova oportunidade” para começar.</div>';return}
+ host.innerHTML=rs.map((r,i)=>({r,i})).reverse().slice(0,30).map(({r,i})=>{const p=recPoints(r);return `<div class="rec"><div><b>${dataBR(r.date)} · ${escapeHtml(PHASES[r.phase]||'Sem fase')}</b><span>${escapeHtml(r.context)} · padrão ${r.old==='1'?'apareceu':r.old==='0'?'não apareceu':'não avaliado'} · resposta ${p===null?'não avaliada':p+'/6'}</span></div><button class="del" data-del="${i}" aria-label="Excluir registro">Excluir</button></div>`}).join('');
+ host.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{if(!confirm('Excluir este registro?'))return;const all=getRecords();all.splice(+b.dataset.del,1);setRecords(all);renderRecords();toast('Registro excluído.')})}
+
+/* ---------- assistente de registro ---------- */
+let W={},wStep=0;const lastPhase=()=>load('tca_eqtempo_ultimafase_v1','base');
+const CTX=['Crítica profissional','Conflito interpessoal','Decisão sob pressão','Outro contexto'];
+function steps(){const st=getStudy();const s=[
+ {id:'fase',title:'Em que fase você está?',sub:'Fase e contexto ficam lembrados para os próximos registros.',render:()=>opts('phase',PH_ORDER.map(k=>[k,PHASES[k]]),'cols2')+`<p class="sub">Contexto</p>`+opts('context',CTX.map(c=>[c,c]),'cols2')+`<label class="f" for="wDate">Data</label><input class="t" type="date" id="wDate" value="${W.date}">`,ok:()=>W.phase&&W.context},
+ {id:'padrao',title:'O padrão antigo apareceu?',sub:escapeHtml(st.target),render:()=>opts('old',[['1','Sim'],['0','Não'],['NA','Não deu para avaliar']],'')+(W.old==='1'?`<p class="sub">Intensidade</p>`+opts('intensity',[['1','Baixa'],['2','Moderada'],['3','Alta']],'cols3')+`<p class="sub">Quanto durou (opcional)</p>`+opts('persistence',[['breve','Breve'],['moderada','Algumas interações'],['prolongada','Além da situação']],''):''),ok:()=>W.old&&(W.old!=='1'||W.intensity)}];
+ if(!W.critNA)['c1','c2','c3'].forEach((k,i)=>s.push({id:k,title:`Nova resposta · critério ${i+1}`,sub:escapeHtml(st[k]),render:()=>opts(k,[['0','Não'],['1','Em parte'],['2','Sim']],'cols3')+(i===0?`<button class="link" id="skipCrit">Não deu para avaliar a nova resposta</button>`:''),ok:()=>W[k]!==undefined}));
+ s.push({id:'auto',title:'Como você percebeu?',sub:'De 0 (nada) a 4 (muito).',render:()=>['regulation','attention','vision'].map((k,j)=>`<p class="sub">${['Consegui regular minha reação','Percebi minha reação antes de responder','Consegui considerar outra interpretação'][j]}</p>`+opts(k,[0,1,2,3,4].map(v=>[String(v),String(v)]),'cols5')).join(''),ok:()=>W.regulation!==undefined&&W.attention!==undefined&&W.vision!==undefined});
+ s.push({id:'obs',title:'Algo a anotar?',sub:'Opcional. Descreva a situação sem nomes.',render:()=>`<textarea class="t" id="wNotes" placeholder="O que aconteceu, o que você fez.">${escapeHtml(W.notes||'')}</textarea>`,ok:()=>true,last:true});
+ return s}
+function opts(field,list,cls){return `<div class="opts ${cls}">`+list.map(([v,l])=>`<button class="opt${W[field]===v?' sel':''}" data-f="${field}" data-v="${escapeHtml(v)}">${l}</button>`).join('')+'</div>'}
+function openWiz(){W={phase:lastPhase(),context:load('tca_eqtempo_ultimocontexto_v1',undefined),date:hojeLocal()};wStep=0;$('wiz').classList.add('on');document.body.style.overflow='hidden';drawWiz()}
+function closeWiz(){$('wiz').classList.remove('on');document.body.style.overflow=''}
+function drawWiz(){const S=steps();wStep=Math.min(wStep,S.length-1);const s=S[wStep];
+ $('wBody').innerHTML=`<h2>${s.title}</h2><div class="q">${s.sub}</div>`+s.render();
+ $('wProg').style.width=((wStep+1)/S.length*100)+'%';$('wBack').style.visibility=wStep?'visible':'hidden';
+ $('wNext').textContent=s.last?'Salvar registro':'Continuar';$('wNext').disabled=!s.ok();
+ $('wBody').querySelectorAll('.opt').forEach(b=>b.onclick=()=>{const f=b.dataset.f,v=b.dataset.v;W[f]=(W[f]===v&&(f==='persistence'))?undefined:v;if(f==='old'&&v!=='1'){delete W.intensity;delete W.persistence}const keepScroll=$('wBody').scrollTop;drawWiz();$('wBody').scrollTop=keepScroll});
+ const d=$('wDate');if(d)d.onchange=()=>{W.date=d.value||hojeLocal()};
+ const n=$('wNotes');if(n)n.oninput=()=>{W.notes=n.value};
+ const sk=$('skipCrit');if(sk)sk.onclick=()=>{W.critNA=true;['c1','c2','c3'].forEach(k=>delete W[k]);drawWiz()}}
+$('wNext').onclick=()=>{const S=steps();if(!S[wStep].ok())return;if(S[wStep].last){saveWiz();return}wStep++;drawWiz();$('wBody').scrollTop=0};
+$('wBack').onclick=()=>{if(wStep===0)return;wStep--;if(W.critNA&&steps()[wStep].id==='padrao')W.critNA=false;drawWiz();$('wBody').scrollTop=0};
+$('wClose').onclick=()=>{if(confirm('Sair sem salvar este registro?'))closeWiz()};
+function saveWiz(){const st=getStudy();const r={date:W.date||hojeLocal(),phase:W.phase,context:W.context,participant:st.participant,target:st.target,crit:[st.c1,st.c2,st.c3],old:W.old,intensity:W.intensity||'',persistence:W.persistence||'',critNA:!!W.critNA,c1:W.critNA?'':W.c1,c2:W.critNA?'':W.c2,c3:W.critNA?'':W.c3,attention:W.attention,vision:W.vision,regulation:W.regulation,notes:W.notes||'',origem:'celular'};
+ const all=getRecords();all.push(r);setRecords(all);save('tca_eqtempo_ultimafase_v1',W.phase);save('tca_eqtempo_ultimocontexto_v1',W.context);closeWiz();renderRecords();toast('Registro salvo neste aparelho.')}
+
+/* ---------- resultados ---------- */
+function phaseStats(rs){const valid=rs.filter(r=>r.old==='1'||r.old==='0');const occ=valid.filter(r=>r.old==='1').length;const crit=rs.filter(r=>recPoints(r)!==null);const pts=crit.reduce((a,r)=>a+recPoints(r),0);const ws=rs.filter(r=>r.regulation!==undefined&&r.regulation!=='');const m=k=>ws.length?ws.reduce((a,r)=>a+(+r[k]),0)/ws.length/4:null;return {n:rs.length,nValid:valid.length,freq:valid.length?100*occ/valid.length:null,nCrit:crit.length,R:crit.length?100*pts/(6*crit.length):null,nSelf:ws.length,rg:m('regulation'),a:m('attention'),vi:m('vision')}}
+let resPart=null,last=null;
+function renderParts(){const sel=$('resPart');const list=[...new Set(getRecords().map(r=>r.participant||''))];const st=getStudy();sel.innerHTML=list.length?list.map(p=>`<option value="${escapeHtml(p)}">${p?escapeHtml(p):'Sem código'}</option>`).join(''):'<option value="">Nenhum registro</option>';if(resPart!==null&&list.includes(resPart))sel.value=resPart;else if(st.participant&&list.includes(st.participant))sel.value=st.participant;else{const f=list.find(p=>p);sel.value=f!==undefined?f:(list[0]??'')}}
+function renderResults(){renderParts();const part=$('resPart').value;const rs=getRecords().filter(r=>(r.participant||'')===part);const by={};PH_ORDER.forEach(k=>by[k]=phaseStats(rs.filter(r=>r.phase===k)));const b=by.base,sg=by.seguimento;const s=sim();const S=s.S/100,n=s.cycles;const f=v=>v===null?'—':fmt(v);const warn=[];
+ const noPh=rs.filter(r=>!r.phase).length;if(noPh)warn.push(`${noPh} registro(s) sem fase não entram nos cálculos.`);
+ if(!b.nValid)warn.push('Sem registros válidos na linha de base: P ainda não pode ser calculado.');else if(b.nValid<10)warn.push(`Linha de base com ${b.nValid} oportunidade(s): resultado apenas ilustrativo.`);
+ if(!sg.nValid)warn.push('Sem registros no seguimento: a transformação observada ainda não existe.');else if(sg.nValid<10)warn.push(`Seguimento com ${sg.nValid} oportunidade(s): resultado apenas ilustrativo.`);
+ let V0=null,vNote='';if($('resSrc').value==='sim'){V0=s.Rg*s.A*s.Vi/1e6;vNote='V₀ do simulador'}else if(b.nSelf){V0=b.rg*b.a*b.vi;vNote='V₀ do autorrelato';if(V0<=0){V0=null;warn.push('Primeiro Evento não verificado: Regulação, Atenção ou Visão ficou em zero na linha de base. As projeções não são calculadas — é um dado sobre o ponto de partida.')}}else if(b.nValid)warn.push('Sem autorrelato na linha de base: V₀ não pode ser estimado.');
+ const P=b.freq,R=b.R;let A=null,B=null;if(P!==null&&R!==null&&V0!==null){A=evolve(P,R,V0,S,n);B=evolveB(P,R,V0,S,n)}const Fo=sg.freq;
+ $('resWarn').innerHTML=warn.map(w=>`<div class="note warn">${escapeHtml(w)}</div>`).join('');
+ $('rP').textContent=f(P);$('rPn').textContent=b.nValid?`${b.nValid} oportunidade(s)`:'';$('rR').textContent=f(R);$('rRn').textContent=b.nCrit?`${b.nCrit} avaliação(ões)`:'';
+ $('rFA').textContent=A?fmt(A.F):'—';$('rFAn').textContent=A?`V ${fmt(A.V*100)}% · R ${fmt(A.R)}`:'';$('rFB').textContent=B?fmt(B.F):'—';$('rFBn').textContent=B?`V ${fmt(B.V*100)}% · R ${fmt(B.R)}`:'';
+ $('rFo').textContent=f(Fo);$('rFon').textContent=sg.nValid?`${sg.nValid} oportunidade(s) · ${vNote||'—'} · S ${s.S}% · ${n} ciclos`:`${vNote} · S ${s.S}% · ${n} ciclos`;
+ let rd='Ainda não há dados suficientes para comparar direção e transformação.';
+ if(P!==null&&Fo!==null){const red=P>0?100*(P-Fo)/P:0;rd=`Transformação observada: o padrão foi de ${fmt(P)} para ${fmt(Fo)} (${red>=0?'redução':'aumento'} de ${fmt(Math.abs(red))}%).`;if(A){const dA=Fo-A.F,dB=Fo-B.F,sgn=d=>(d>0?'+':'')+fmt(d);rd+=` Direção projetada: A ${fmt(A.F)} (${sgn(dA)}), B ${fmt(B.F)} (${sgn(dB)}). `+(Math.abs(Math.abs(dA)-Math.abs(dB))<2?'Os dois modelos ficaram igualmente próximos.':`O Modelo ${Math.abs(dA)<Math.abs(dB)?'A':'B'} ficou mais próximo neste participante.`)}rd+=' Estes números descrevem o comportamento-alvo, não a pessoa.'}
+ $('rRead').textContent=rd;
+ const lp=[...PH_ORDER].reverse().find(k=>by[k].nValid);
+ $('mP').textContent=P===null?'Linha de base ainda sem registros válidos.':`O padrão que nos formou apareceu em ${fmt(P)}% das oportunidades${R!==null?`; a nova resposta começava em ${fmt(R)} pontos`:''}.`;
+ $('mN').textContent=lp?`Fase mais recente (${PHASES[lp]}): padrão em ${f(by[lp].freq)}%; nova resposta em ${f(by[lp].R)} pontos.`:'Ainda sem registros com fase.';
+ $('mF').textContent=A?`As escolhas presentes apontam para carga de ${fmt(A.F)} (A) e ${fmt(B.F)} (B). Direção, não sentença.`:'Ainda não há dados para projetar uma direção.';
+ /* curva da visão */
+ if(V0===null||n<1){$('vChart').innerHTML='<div class="empty">É preciso V₀ e ao menos 1 ciclo.</div>';$('vRead').textContent='Ainda não há dados suficientes.'}else{const a=series(evolve,100,50,V0,S,n).map(o=>o.V*100),bb=series(evolveB,100,50,V0,S,n).map(o=>o.V*100);a.push(a[n]);bb.push(bb[n]);const labels=[...Array(n+1).keys()].map(String).concat(['Seg.']);const mid=Math.round(n/2);const rel=new Array(n+2).fill(null);const vr=k=>by[k].nSelf?by[k].rg*by[k].a*by[k].vi*100:null;rel[0]=vr('base');rel[mid]=vr('aplicacao');rel[n]=vr('consolidacao');rel[n+1]=vr('seguimento');lineChart($('vChart'),[{color:'#d6b56d',pts:a},{color:'#78c5a0',pts:bb},{color:'#8ba9e8',pts:rel,dots:true}],100,v=>fmt(v,0)+'%',labels);let eA=0,eB=0,k=0;[mid,n,n+1].forEach(i=>{if(rel[i]!==null){eA+=Math.abs(rel[i]-a[i]);eB+=Math.abs(rel[i]-bb[i]);k++}});$('vRead').textContent=k?`Diferença média: A ${fmt(eA/k)} pontos, B ${fmt(eB/k)} pontos, em ${k} fase(s). `+(Math.abs(eA-eB)/k<3?'Curvas parecidas neste participante.':`A visão relatada lembra mais o Modelo ${eA<eB?'A':'B'}.`)+' Autorrelato é percepção, não medida objetiva.':'Ainda sem autorrelato nas fases de prática.'}
+ $('phases').innerHTML=PH_ORDER.map(k=>{const t=by[k];return `<div style="margin-top:10px"><b>${PHASES[k]}</b> <span class="muted">· ${t.n} registro(s)</span><div class="bl"><span>Padrão</span><span>${f(t.freq)}</span></div><div class="bar"><i style="width:${t.freq||0}%"></i></div><div class="bl"><span>Nova resposta</span><span>${f(t.R)}</span></div><div class="bar g"><i style="width:${t.R||0}%"></i></div></div>`}).join('');
+ last={part,by,P,R,V0,A,B,Fo,s}}
+$('resPart').onchange=()=>{resPart=$('resPart').value;renderResults()};$('resSrc').onchange=renderResults;
+
+/* ---------- estudo, exportação ---------- */
+function loadStudy(){const st=getStudy();$('stP').value=st.participant;$('stT').value=st.target;$('stC1').value=st.c1;$('stC2').value=st.c2;$('stC3').value=st.c3}
+$('saveStudy').onclick=()=>{save(KEY_STUDY,{participant:$('stP').value.trim(),target:$('stT').value.trim(),c1:$('stC1').value.trim(),c2:$('stC2').value.trim(),c3:$('stC3').value.trim()});renderRecords();toast('Definição do estudo salva.')};
+$('partChip').onclick=()=>show('sc-more');
+$('expRec').onclick=()=>{const rs=getRecords();if(!rs.length){toast('Não há registros para exportar.');return}const head=['Data','Fase','Participante','Comportamento-alvo','Contexto','Padrão apareceu (1/0/NA)','Intensidade (1-3)','Persistência','Critério 1','Critério 2','Critério 3','Pontos nova resposta (0-6)','Nova resposta (versão antiga)','Autorrelato atenção','Autorrelato visão','Autorrelato regulação','Observações'];const rows=[head,...rs.map(r=>{const p=recPoints(r);return [r.date,PHASES[r.phase]||'',r.participant||'',r.target||'',r.context,r.old,r.intensity||'',r.persistence||'',r.critNA?'NA':(r.c1??''),r.critNA?'NA':(r.c2??''),r.critNA?'NA':(r.c3??''),p===null?'':p,r.c1===undefined?(r.response??''):'',r.attention,r.vision,r.regulation??'',r.notes]})];exportFile('tca_eqtempo_registros.csv',rows.map(csvRow).join('\r\n'))};
+$('expRes').onclick=()=>{renderResults();const L=last;if(!L||!getRecords().length){toast('Não há resultados para exportar.');return}const n=v=>v==null?'':fmt(v);const rows=[['Participante',L.part||'Sem código'],['S (%)',L.s.S],['Ciclos',L.s.cycles],[],['Indicador','Valor'],['P linha de base',n(L.P)],['R inicial',n(L.R)],['V0 (%)',L.V0==null?'':fmt(L.V0*100)],['Direção modelo A',L.A?fmt(L.A.F):''],['Direção modelo B',L.B?fmt(L.B.F):''],['Transformação observada (seguimento)',n(L.Fo)],[],['Fase','Registros','Oportunidades válidas','Frequência do padrão','Avaliações de critério','Nova resposta (pontos)','Autorrelato regulação','Autorrelato atenção','Autorrelato visão'],...PH_ORDER.map(k=>{const t=L.by[k];return [PHASES[k],t.n,t.nValid,n(t.freq),t.nCrit,n(t.R),t.rg==null?'':fmt(t.rg*4,2),t.a==null?'':fmt(t.a*4,2),t.vi==null?'':fmt(t.vi*4,2)]})];exportFile('tca_eqtempo_resultados.csv',rows.map(csvRow).join('\r\n'))};
+$('clearAll').onclick=()=>{if(!getRecords().length){toast('Não há registros.');return}if(confirm('Apagar todos os registros deste aparelho? Exporte antes, se quiser guardar.')&&confirm('Tem certeza? Isso não pode ser desfeito.')){setRecords([]);renderRecords();toast('Registros apagados.')}};
+
+/* ---------- navegação ---------- */
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.sc===id));if(id==='sc-res')renderResults();window.scrollTo(0,0)}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>show(b.dataset.sc));
+$('newRec').onclick=openWiz;
+['P','R','Rg','A','Vi','S','cycles'].forEach(k=>$(k).addEventListener('input',renderSim));
+
+/* ---------- início ---------- */
+try{if(!localStorage.getItem(KEY_REC)&&localStorage.getItem('avrsRecords'))localStorage.setItem(KEY_REC,localStorage.getItem('avrsRecords'))}catch(e){}
+(()=>{const s=getSim();Object.entries(s).forEach(([k,v])=>{if($(k))$(k).value=v})})();
+loadStudy();renderRecords();renderSim();
+</script>
+</body>
+</html>
